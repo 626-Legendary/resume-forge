@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* base */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
+.page {
   font-family: Arial, Helvetica, sans-serif;
+  background: white;
+  color: black;
+  /* Letter page */
+  width: 8.5in;
+  /* height: 11in; */
+  margin: 0 auto;
+  padding: 0.4in 0.45in;
+  box-sizing: border-box;
+}
+
+.page * {
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.page span{
+  @apply inline-block text-sm text-center leading-tight;
+}
+
+/* Name */
+.page h1 {
+  @apply block text-xl font-bold leading-tight;
+}
+
+/* Section */
+.page h2 {
+  @apply block font-bold border-b-2 leading-tight my-0.5; 
+}
+
+/* Job Company */
+.page h3 {
+  @apply inline text-sm font-semibold leading-none;
+}
+
+/* Job Title */
+.page h4 {
+  @apply block text-sm italic leading-tight;
+}
+
+.page ul {
+  @apply pl-4;
+}
+
+.page li {
+  @apply list-disc text-sm text-justify leading-tight;
+}
+
+.info {
+  @apply flex flex-wrap justify-center items-center gap-x-2 text-sm leading-tight;
+}
+
+.info p {
+  @apply text-sm text-center leading-tight;
+}
+
+.info p:not(:last-child)::after {
+  content: "|";
+  margin-left: 8px;
+}
+
+section p {
+  @apply text-sm text-justify leading-tight content-center;
+}
+
+.company {
+  @apply flex justify-between
 }

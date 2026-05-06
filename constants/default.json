@@ -1,0 +1,66 @@
+{
+  "basicInfo": {
+    "name": "",
+    "contact": {
+      "tel": "",
+      "email": "",
+      "location": "",
+      "linkedIn": "",
+      "github": "",
+      "portfolio": "",
+      "website": "",
+      "extra": ""
+    }
+  },
+  "summary": "",
+  "skills": {
+    "Languages": [],
+    "Frontend": [],
+    "Backend": [],
+    "Databases": [],
+    "CloudDevOps": [],
+    "Tools": []
+  },
+  "experiences": [
+    {
+      "company": "",
+      "title": "",
+      "location": "",
+      "date": "",
+      "description": []
+    }
+  ],
+  "projects": [
+    {
+      "name": "",
+      "tools": [],
+      "date": "",
+      "url": "",
+      "description": []
+    }
+  ],
+  "education": [
+    {
+      "school": "",
+      "degree": "",
+      "major": "",
+      "location": "",
+      "date": "",
+      "startDate": "",
+      "endDate": "",
+      "gpa": "",
+      "honors": [],
+      "description": []
+    }
+  ],
+  "certifications": [
+    {
+      "name": "",
+      "issuer": "",
+      "date": "",
+      "expirationDate": "",
+      "credentialId": "",
+      "url": ""
+    }
+  ]
+}
