@@ -129,46 +129,7 @@ const ResumeTemplate = ({ data }: ResumeTemplateProps) => {
                 </section>
             )}
 
-            {resumeData.experiences && resumeData.experiences.length > 0 && (
-                <section>
-                    <h2>Experiences</h2>
 
-                    {resumeData.experiences.map((experience, index) => (
-                        <div key={`experience-${index}-${experience.company}-${experience.title}`}>
-                            <div>
-                                <div className="company">
-                                    <div>
-                                        <h3>
-                                            {experience.company}
-
-                                        </h3>
-                                        {experience.location && (
-                                            <>
-                                                <span>&nbsp; - &nbsp;</span>
-                                                <span>{experience.location}</span>
-                                            </>
-                                        )}
-                                    </div>
-
-                                    {(experience.date) && (
-                                        <p>{formatDateRange(experience)}</p>
-                                    )}
-                                </div>
-
-                                <h4>{experience.title}</h4>
-                            </div>
-
-                            {experience.description && experience.description.length > 0 && (
-                                <ul>
-                                    {experience.description.map((item, itemIndex) => (
-                                        <li key={`experience-bullet-${index}-${itemIndex}`}>{item}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    ))}
-                </section>
-            )}
 
             {resumeData.projects && resumeData.projects.length > 0 && (
                 <section>
@@ -213,7 +174,46 @@ const ResumeTemplate = ({ data }: ResumeTemplateProps) => {
             )}
 
 
+            {resumeData.experiences && resumeData.experiences.length > 0 && (
+                <section>
+                    <h2>Experiences</h2>
 
+                    {resumeData.experiences.map((experience, index) => (
+                        <div key={`experience-${index}-${experience.company}-${experience.title}`}>
+                            <div>
+                                <div className="company">
+                                    <div>
+                                        <h3>
+                                            {experience.company}
+
+                                        </h3>
+                                        {experience.location && (
+                                            <>
+                                                <span>&nbsp; - &nbsp;</span>
+                                                <span>{experience.location}</span>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {(experience.date) && (
+                                        <p>{formatDateRange(experience)}</p>
+                                    )}
+                                </div>
+
+                                <h4>{experience.title}</h4>
+                            </div>
+
+                            {experience.description && experience.description.length > 0 && (
+                                <ul>
+                                    {experience.description.map((item, itemIndex) => (
+                                        <li key={`experience-bullet-${index}-${itemIndex}`}>{item}</li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    ))}
+                </section>
+            )}
             {resumeData.certifications && resumeData.certifications.length > 0 && (
                 <section>
                     <h2>Certifications</h2>
