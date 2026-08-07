@@ -8,7 +8,7 @@
   color: black;
   /* Letter page */
   width: 8.5in;
-  /* height: 11in; */
+  min-height: 11in;
   margin: 0 auto;
   padding: 0.4in 0.45in;
   box-sizing: border-box;

@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 export default function Home() {
   return (
     <main
-      className={`${orbitron.variable} ${jetbrainsMono.variable} min-h-screen overflow-hidden bg-[#07090c] font-[var(--font-mono)] text-white`}
+      className={`${orbitron.variable} ${jetbrainsMono.variable} min-h-screen overflow-x-hidden bg-[#07090c] font-[var(--font-mono)] text-white`}
     >
       <style jsx global>{`
         :root {
@@ -185,25 +185,25 @@ export default function Home() {
         <section className="relative z-10 flex min-h-[calc(100vh-73px)] items-center">
           <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 px-4 py-14 sm:px-5 md:px-8 md:py-16 lg:grid-cols-[1fr_0.92fr] lg:items-center">
             <div className="rf-rise">
-              <p className="rf-brand-font text-[11px] font-bold uppercase tracking-[0.32em] text-orange-400 sm:text-xs sm:tracking-[0.4em]">
+              <p className="rf-brand-font text-[10px] font-bold uppercase tracking-[0.22em] text-orange-400 sm:text-xs sm:tracking-[0.4em]">
                 JSON to print-ready resume
               </p>
 
-              <h1 className="rf-brand-font mt-5 text-5xl font-extrabold uppercase tracking-[0.035em] text-zinc-100 sm:text-6xl md:text-7xl lg:text-8xl">
+              <h1 className="rf-brand-font mt-3 max-w-[9ch] text-[2.6rem] font-extrabold uppercase leading-[0.9] tracking-[0.035em] text-zinc-100 sm:mt-5 sm:max-w-none sm:text-6xl md:text-7xl lg:text-8xl">
                 Resume
                 <span className="block text-orange-500">Forge</span>
               </h1>
 
-              <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-zinc-300 sm:text-lg md:text-xl md:leading-8">
+              <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-zinc-300 sm:mt-6 sm:max-w-2xl sm:text-base sm:leading-7 md:text-xl md:leading-8">
                 Turn AI-generated resume JSON into an ATS-friendly,
                 print-ready resume. Copy, paste, preview, and export without
                 manually rebuilding layouts.
               </p>
 
-              <div className="mt-8 flex flex-col gap-3 sm:mt-9 sm:flex-row">
+              <div className="mt-8 flex w-full flex-col gap-3 sm:mt-9 sm:w-auto sm:flex-row">
                 <Link
                   href="/dashboard"
-                  className="rf-brand-font rf-glow inline-flex items-center justify-center border border-orange-300 bg-orange-500 px-5 py-4 text-xs font-extrabold uppercase tracking-[0.18em] text-black transition hover:bg-orange-400 sm:px-6 sm:text-sm"
+                  className="rf-brand-font rf-glow inline-flex w-full items-center justify-center border border-orange-300 bg-orange-500 px-5 py-4 text-xs font-extrabold uppercase tracking-[0.18em] text-black transition hover:bg-orange-400 sm:w-auto sm:px-6 sm:text-sm"
                 >
                   Start Forging
                 </Link>
@@ -212,28 +212,28 @@ export default function Home() {
                   href="https://github.com/626-Legendary"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rf-brand-font inline-flex items-center justify-center gap-2 border border-zinc-700 bg-[#0b1016] px-5 py-4 text-xs font-bold uppercase tracking-[0.14em] text-zinc-300 transition hover:border-orange-400 hover:text-orange-400 sm:px-6 sm:text-sm"
+                  className="rf-brand-font inline-flex w-full items-center justify-center gap-2 border border-zinc-700 bg-[#0b1016] px-5 py-4 text-xs font-bold uppercase tracking-[0.14em] text-zinc-300 transition hover:border-orange-400 hover:text-orange-400 sm:w-auto sm:px-6 sm:text-sm"
                 >
                   <FaGithub />
                   View GitHub
                 </Link>
               </div>
 
-              <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 sm:text-sm sm:tracking-[0.22em]">
+              <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500 sm:mt-6 sm:text-sm sm:tracking-[0.22em]">
                 Apply faster. Tailor smarter. Land sooner.
               </p>
             </div>
 
             {/* Product visual */}
-            <div className="rf-rise relative [animation-delay:120ms]">
+            <div className="rf-rise relative mx-auto w-full max-w-2xl [animation-delay:120ms] lg:mx-0 lg:max-w-none">
               <div className="relative overflow-hidden border border-orange-500/25 bg-[#0b1016]/90 shadow-[0_36px_100px_rgba(0,0,0,0.5)]">
                 <div className="flex items-center justify-between gap-4 border-b border-orange-500/20 bg-[#111820] px-4 py-4 sm:px-5">
                   <div className="min-w-0">
                     <p className="rf-brand-font text-[10px] font-bold uppercase tracking-[0.24em] text-orange-400 sm:tracking-[0.28em]">
-                      Resume Forge Console
+                      
                     </p>
 
-                    <p className="mt-1 truncate text-[11px] font-semibold text-zinc-400 sm:text-xs md:text-sm">
+                    <p className="rf-brand-font mt-1 truncate text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 sm:text-[11px] md:text-xs">
                       Input -&gt; Parse -&gt; Preview -&gt; Export
                     </p>
                   </div>
@@ -264,12 +264,12 @@ export default function Home() {
                     </div>
 
                     <div className="mt-6 grid gap-3">
-                      <div className="flex items-center gap-2 border border-orange-500/30 bg-orange-500/10 px-3 py-3 text-xs font-bold text-orange-400 sm:text-sm">
+                      <div className="rf-brand-font flex items-center gap-2 border border-orange-500/30 bg-orange-500/10 px-3 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-orange-400 sm:text-xs">
                         <FaHammer />
                         Parse JSON
                       </div>
 
-                      <div className="border border-zinc-700 px-3 py-3 text-xs font-semibold text-zinc-400 sm:text-sm">
+                      <div className="rf-brand-font border border-zinc-700 px-3 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 sm:text-xs">
                         Load Mock Data
                       </div>
                     </div>

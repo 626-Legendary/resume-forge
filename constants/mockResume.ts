@@ -8,12 +8,24 @@ export const mockResumeData: ResumeData = {
         contact: {
             tel: "+1 626-265-2954",
             email: "zhangzexiang626@gmail.com",
-            linkedIn: "linkedin.com/in/zexiangzhang",
-            github: "github.com/626-Legendary",
-            portfolio: "zexiang-zhang-portfolio.vercel.app",
-            website: "",
             location: "Los Angeles, CA",
-            extra: "No sponsorship needed",
+            extra: {
+                linkedIn: {
+                    content: "linkedin.com/in/zexiangzhang",
+                    link: "https://linkedin.com/in/zexiangzhang",
+                },
+                github: {
+                    content: "github.com/626-Legendary",
+                    link: "https://github.com/626-Legendary",
+                },
+                portfolio: {
+                    content: "zexiang-zhang-portfolio.vercel.app",
+                    link: "https://zexiang-zhang-portfolio.vercel.app",
+                },
+                sponsorship: {
+                    content: "No sponsorship needed",
+                },
+            },
         },
     },
 

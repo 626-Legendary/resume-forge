@@ -15,16 +15,18 @@ export type BasicInfo = {
   contact?: ContactInfo;
 };
 
+export type ContactExtraEntry = {
+  content: string;
+  link?: string;
+};
+
+export type ContactExtraMap = Record<string, string | ContactExtraEntry>;
+
 export type ContactInfo = {
   tel: string;
   email: string;
   location: string;
-  linkedIn?: string;
-  github?: string;
-  portfolio?: string;
-  website?: string;
-
-  extra?: string;
+  extra?: ContactExtraMap;
 };
 
 export type SkillsByCategory = Record<string, string[]>;

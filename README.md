@@ -98,6 +98,7 @@ Example prompt:
 
 ```text
 Convert my resume into the following JSON schema for Resume Forge.
+
 {
   "basicInfo": {
     "name": "",
@@ -105,11 +106,27 @@ Convert my resume into the following JSON schema for Resume Forge.
       "tel": "",
       "email": "",
       "location": "",
-      "linkedIn": "",
-      "github": "",
-      "portfolio": "",
-      "website": "",
-      "extra": ""
+      "extra": {
+        "status": {
+          "content": ""
+        },
+        "linkedIn": {
+          "content": "",
+          "link": ""
+        },
+        "github": {
+          "content": "",
+          "link": ""
+        },
+        "portfolio": {
+          "content": "",
+          "link": ""
+        },
+        "website": {
+          "content": "",
+          "link": ""
+        }
+      }
     }
   },
   "summary": "",
@@ -164,6 +181,7 @@ Convert my resume into the following JSON schema for Resume Forge.
     }
   ]
 }
+
 Return only valid JSON.
 ````
 
@@ -191,11 +209,27 @@ Example shape:
       "tel": "+1 (555) 876-5432",
       "email": "alex.morgan@example.com",
       "location": "Austin, TX",
-      "linkedIn": "linkedin.com/in/alexmorgan",
-      "github": "github.com/alexmorgan",
-      "portfolio": "alexmorgan.dev",
-      "website": "alexmorgan.dev/blog",
-      "extra": "U.S. Citizen | Authorized to work in the U.S. | Open to Relocation"
+      "extra": {
+        "linkedIn": {
+          "content": "linkedin.com/in/alexmorgan",
+          "link": "https://linkedin.com/in/alexmorgan"
+        },
+        "github": {
+          "content": "github.com/alexmorgan",
+          "link": "https://github.com/alexmorgan"
+        },
+        "portfolio": {
+          "content": "alexmorgan.dev",
+          "link": "https://alexmorgan.dev"
+        },
+        "website": {
+          "content": "alexmorgan.dev/blog",
+          "link": "https://alexmorgan.dev/blog"
+        },
+        "status": {
+          "content": "U.S. Citizen | Authorized to work in the U.S. | Open to Relocation"
+        }
+      }
     }
   },
   "summary": "Full Stack Engineer with 5+ years of experience building scalable web applications and leading feature development. Proficient in modern JavaScript frameworks, cloud-native architectures, and DevOps practices. Passionate about clean code, system design, and mentoring junior engineers. Recently focused on AI-integrated tools and real-time data processing.",
@@ -360,32 +394,6 @@ Build for production:
 
 ```bash
 npm run build
-```
-
-## Project Structure
-
-```text
-app/
-  page.tsx              # Landing page
-  dashboard/page.tsx    # JSON editor, template selector, and live preview
-  export/page.tsx       # Print-ready export route
-
-components/
-  AppFooter.tsx
-  resume-template-renderer.tsx
-  templateEngineer.tsx
-  templateEngineerIntern.tsx
-
-constants/
-  default.json          # Empty resume schema template
-  mockData.json         # Example resume data
-
-lib/
-  resume.ts             # Resume parsing, normalization, and storage helpers
-  resume-template.ts    # Template configuration
-
-types/
-  resume.ts             # Resume TypeScript types
 ```
 
 ## Current Focus

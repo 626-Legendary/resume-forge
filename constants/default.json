@@ -5,11 +5,27 @@
       "tel": "",
       "email": "",
       "location": "",
-      "linkedIn": "",
-      "github": "",
-      "portfolio": "",
-      "website": "",
-      "extra": ""
+      "extra": {
+        "status": {
+          "content": ""
+        },
+        "linkedIn": {
+          "content": "",
+          "link": ""
+        },
+        "github": {
+          "content": "",
+          "link": ""
+        },
+        "portfolio": {
+          "content": "",
+          "link": ""
+        },
+        "website": {
+          "content": "",
+          "link": ""
+        }
+      }
     }
   },
   "summary": "",

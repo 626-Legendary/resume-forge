@@ -1,4 +1,4 @@
-import type { ResumeData } from "@/types/resume";
+import type { ContactExtraEntry, ResumeData } from "@/types/resume";
 
 type ResumeTemplateProps = {
     data: ResumeData;
@@ -13,11 +13,8 @@ const ResumeTemplate = ({ data }: ResumeTemplateProps) => {
         contact?.tel,
         contact?.email,
         contact?.location,
-        contact?.linkedIn,
-        contact?.github,
-        contact?.portfolio,
-        contact?.website,
     ].filter(Boolean);
+    const extraItems = getExtraEntries(contact?.extra);
 
     return (
         <div className="page">
@@ -29,33 +26,32 @@ const ResumeTemplate = ({ data }: ResumeTemplateProps) => {
                         {contactItems.map((item, index) => {
                             const value = String(item);
 
-                            const isLink =
-                                value.includes(".com") ||
-                                value.includes(".app") ||
-                                value.startsWith("http");
-
                             return (
-                                <p key={`contact-${index}-${value}`}>
-                                    {isLink ? (
-                                        <a
-                                            href={normalizeUrl(value)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {value}
-                                        </a>
-                                    ) : (
-                                        value
-                                    )}
+                                <p key={`contact-${index}-${value}`} className="font-bold">
+                                    {value}
                                 </p>
                             );
                         })}
                     </div>
                 )}
 
-                {contact?.extra && (
+                {extraItems.length > 0 && (
                     <div className="info text-center">
-                        <p className="font-bold">{contact.extra}</p>
+                        {extraItems.map((item, index) => (
+                            <p key={`extra-${index}-${item.content}`}>
+                                {item.link ? (
+                                    <a
+                                        href={normalizeUrl(item.link)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {item.content}
+                                    </a>
+                                ) : (
+                                    item.content
+                                )}
+                            </p>
+                        ))}
                     </div>
                 )}
             </header>
@@ -254,6 +250,31 @@ const ResumeTemplate = ({ data }: ResumeTemplateProps) => {
 };
 
 export default ResumeTemplate;
+
+function getExtraEntries(
+    extra: Record<string, string | ContactExtraEntry> | undefined
+): Array<{ content: string; link?: string }> {
+    if (!extra) {
+        return [];
+    }
+
+    return Object.values(extra)
+        .map((item) => {
+            if (typeof item === "string") {
+                return item ? { content: item } : null;
+            }
+
+            if (item && typeof item.content === "string") {
+                return {
+                    content: item.content,
+                    link: item.link && item.link.trim() ? item.link : undefined,
+                };
+            }
+
+            return null;
+        })
+        .filter((item): item is { content: string; link?: string } => Boolean(item));
+}
 
 function normalizeUrl(url: string) {
     if (url.startsWith("http://") || url.startsWith("https://")) {

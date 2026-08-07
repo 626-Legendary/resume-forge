@@ -5,6 +5,7 @@ import Image from "next/image";
 import { JetBrains_Mono, Orbitron } from "next/font/google";
 import AppFooter from "@/components/AppFooter";
 import ResumeTemplateRenderer from "@/components/resume-template-renderer";
+
 import {
   DEFAULT_RESUME_TEMPLATE_ID,
   RESUME_TEMPLATE_OPTIONS,
@@ -233,14 +234,6 @@ const Page = () => {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleExport}
-              disabled={!resumeData}
-              className="rf-brand-font shrink-0 border border-orange-400 bg-[var(--rf-orange)] px-3 py-2 text-[11px] font-extrabold uppercase tracking-[0.14em] text-black transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:border-zinc-700 disabled:bg-zinc-800 disabled:text-zinc-500 sm:px-5 sm:py-2.5 sm:text-xs sm:tracking-[0.18em]"
-            >
-              Export PDF
-            </button>
           </div>
         </header>
 
@@ -262,7 +255,7 @@ const Page = () => {
         </section>
 
         {/* Main composition: Input Bay | Control Console | Output Bay */}
-        <div className="relative z-10 mx-auto grid w-full max-w-[1720px] flex-1 grid-cols-1 gap-4 p-4 sm:p-5 md:px-7 xl:grid-cols-[430px_310px_minmax(0,1fr)]">
+        <div className="relative z-10 mx-auto grid w-full max-w-[1720px] flex-1 grid-cols-1 gap-4 p-4 sm:p-5 md:px-7 xl:grid-cols-[430px_310px_minmax(0,1.55fr)]">
           {/* Input Bay */}
           <section className="rf-enter flex min-h-[620px] flex-col overflow-hidden border border-zinc-800 bg-[var(--rf-panel)] xl:min-h-[720px]">
             <div className="border-b border-zinc-800 bg-[var(--rf-panel-3)] px-4 py-4 sm:px-5">
@@ -276,8 +269,8 @@ const Page = () => {
                     JSON Input
                   </h2>
 
-                  <p className="mt-1 text-sm leading-6 text-[var(--rf-muted)]">
-                    Edit the schema or paste AI-generated resume JSON.
+                  <p className="mt-1 max-w-[220px] text-sm leading-6 text-[var(--rf-muted)]">
+                    Edit JSON or paste AI-generated resume data.
                   </p>
                 </div>
 
@@ -385,18 +378,18 @@ const Page = () => {
                       type="button"
                       onClick={() => setTemplateId(option.id)}
                       title={option.description}
-                      className={`border px-3 py-3 text-left transition ${
+                      className={`rf-brand-font w-full border px-3 py-3 text-left transition ${
                         isSelected
                           ? "border-orange-400 bg-[var(--rf-orange)] text-black"
                           : "border-zinc-700 bg-[#0b1016] text-zinc-200 hover:border-orange-400 hover:text-orange-300"
                       }`}
                     >
-                      <span className="block text-sm font-bold uppercase tracking-[0.08em]">
+                      <span className="block text-[10px] font-extrabold uppercase tracking-[0.14em] sm:text-xs sm:tracking-[0.18em]">
                         {option.label}
                       </span>
 
                       <span
-                        className={`mt-1 block text-sm leading-5 ${
+                        className={`mt-1 block text-[11px] leading-5 ${
                           isSelected ? "text-black/70" : "text-zinc-500"
                         }`}
                       >
@@ -422,8 +415,9 @@ const Page = () => {
               </ol>
 
               <p className="mt-4 border-t border-zinc-800 pt-4 text-sm leading-6 text-zinc-500">
-                Tip: Ask ChatGPT, Gemini, or Claude to generate resume JSON from
-                your existing resume, then paste it here.
+                <span className="font-semibold text-zinc-300">Tip:</span> Ask
+                ChatGPT, Gemini, or Claude to generate resume JSON from your
+                existing resume, then paste it here.
               </p>
             </section>
           </aside>
@@ -445,24 +439,37 @@ const Page = () => {
                 </p>
               </div>
 
-              <div
-                className={`shrink-0 border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] sm:text-xs sm:tracking-[0.14em] ${
-                  resumeData
-                    ? "border-green-500/40 bg-green-500/10 text-green-400"
-                    : "border-zinc-700 bg-[#0b1016] text-zinc-500"
-                }`}
-              >
-                {resumeData ? "Ready" : "Standby"}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  disabled={!resumeData}
+                  className="rf-brand-font shrink-0 border border-orange-400 bg-[var(--rf-orange)] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-black transition hover:bg-orange-400 disabled:cursor-not-allowed disabled:border-zinc-700 disabled:bg-zinc-800 disabled:text-zinc-500 sm:text-xs sm:tracking-[0.18em]"
+                >
+                  Export PDF
+                </button>
+
+                <div
+                  className={`shrink-0 border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] sm:text-xs sm:tracking-[0.14em] ${
+                    resumeData
+                      ? "border-green-500/40 bg-green-500/10 text-green-400"
+                      : "border-zinc-700 bg-[#0b1016] text-zinc-500"
+                  }`}
+                >
+                  {resumeData ? "Ready" : "Standby"}
+                </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto bg-[linear-gradient(135deg,rgba(255,255,255,0.03),transparent_32%),#0b1016] p-4 sm:p-5 md:p-6">
+            <div className="flex flex-1 justify-center overflow-auto bg-[linear-gradient(135deg,rgba(255,255,255,0.03),transparent_32%),#0b1016] p-4 sm:p-5 md:p-6">
               {resumeData ? (
-                <div className="mx-auto w-fit bg-white p-4 text-black shadow-[0_24px_80px_rgba(0,0,0,0.55)] sm:p-8">
-                  <ResumeTemplateRenderer
-                    data={resumeData}
-                    templateId={templateId}
-                  />
+                <div className="mx-auto w-[816px] max-w-full bg-white p-4 text-black shadow-[0_24px_80px_rgba(0,0,0,0.55)] sm:p-8">
+                  <div className="flex justify-center">
+                    <ResumeTemplateRenderer
+                      data={resumeData}
+                      templateId={templateId}
+                    />
+                  </div>
                 </div>
               ) : (
                 <div className="flex h-full min-h-[460px] items-center justify-center sm:min-h-[560px]">

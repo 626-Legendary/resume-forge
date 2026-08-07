@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaCoffee, FaEnvelope, FaGithub } from "react-icons/fa";
-
+import { app_version } from "@/constants/metaData";
 import logo from "@/public/logo.png";
 
 const footerLinks = [
@@ -40,7 +40,7 @@ const AppFooter = () => {
       />
 
       <div className="relative mx-auto max-w-[1720px]">
-        <div className="mb-5 h-px w-full bg-gradient-to-r from-transparent via-orange-500/45 to-transparent" />
+        
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
@@ -62,8 +62,9 @@ const AppFooter = () => {
 
               <div className="min-w-0">
                 <p className="font-[var(--font-orbitron)] text-sm font-black uppercase tracking-[0.24em] text-orange-400 sm:tracking-[0.28em]">
-                  Resume Forge
+                  Resume Forge <span className="text-xs tracking-[0.1em]">v{app_version}</span>
                 </p>
+                
 
                 <p className="mt-1 hidden font-[var(--font-mono)] text-[11px] uppercase tracking-[0.16em] text-zinc-600 sm:block">
                   JSON to print-ready resume
@@ -71,10 +72,6 @@ const AppFooter = () => {
               </div>
             </div>
 
-            <p className="mt-4 max-w-xl font-[var(--font-mono)] text-xs leading-6 text-zinc-500 sm:text-sm">
-              Forge tailored resumes faster. Parse JSON, preview instantly, and
-              export clean PDFs for your next application.
-            </p>
           </div>
 
           <nav
@@ -99,8 +96,9 @@ const AppFooter = () => {
             })}
           </nav>
         </div>
-
-        <div className="mt-7 flex flex-col gap-4 border-t border-zinc-800 pt-5 font-[var(--font-mono)] text-xs leading-5 text-zinc-600 md:flex-row md:items-end md:justify-between">
+        <div className="my-5 h-px w-full bg-gradient-to-r from-transparent via-orange-500/45 to-transparent" />    
+        <div className="flex flex-col gap-4 border-zinc-800 font-[var(--font-mono)] text-xs leading-5 text-zinc-600 md:flex-row md:items-end md:justify-between">
+          
           <div>
             <p>
               Copyright {new Date().getFullYear()} Resume Forge. All rights

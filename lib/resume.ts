@@ -7,6 +7,7 @@ import {
 } from "@/lib/resume-template";
 import type {
   Certification,
+  ContactExtraEntry,
   Education,
   Experience,
   Project,
@@ -44,11 +45,7 @@ export function normalizeResumeData(input: unknown): ResumeData {
         tel: toText(contact.tel),
         email: toText(contact.email),
         location: toText(contact.location),
-        linkedIn: toOptionalText(contact.linkedIn),
-        github: toOptionalText(contact.github),
-        portfolio: toOptionalText(contact.portfolio),
-        website: toOptionalText(contact.website),
-        extra: toOptionalText(contact.extra),
+        extra: normalizeContactExtra(contact.extra),
       },
     },
     summary: toOptionalText(source.summary),
@@ -198,6 +195,62 @@ function normalizeCertifications(value: unknown): Certification[] | undefined {
     );
 
   return certifications.length > 0 ? certifications : undefined;
+}
+
+function normalizeContactExtra(
+  value: unknown
+): Record<string, ContactExtraEntry> | undefined {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const source = toRecord(value);
+  const normalizedEntries: Array<[string, ContactExtraEntry]> = Object.entries(
+    source
+  )
+    .map(([key, entryValue]) => {
+      const normalizedEntry = normalizeContactExtraEntry(entryValue);
+
+      return normalizedEntry ? ([key, normalizedEntry] as const) : null;
+    })
+    .filter((entry): entry is [string, ContactExtraEntry] => entry !== null);
+
+  if (normalizedEntries.length === 0) {
+    return undefined;
+  }
+
+  return Object.fromEntries(normalizedEntries);
+}
+
+function normalizeContactExtraEntry(
+  value: unknown
+): ContactExtraEntry | undefined {
+  if (typeof value === "string") {
+    const text = toText(value);
+    return text ? { content: text } : undefined;
+  }
+
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const source = toRecord(value);
+  const content =
+    toOptionalText(source.content) ??
+    toOptionalText(source.text) ??
+    toOptionalText(source.value) ??
+    toOptionalText(source.label);
+
+  if (!content) {
+    return undefined;
+  }
+
+  const link =
+    toOptionalText(source.link) ??
+    toOptionalText(source.href) ??
+    toOptionalText(source.url);
+
+  return link ? { content, link } : { content };
 }
 
 function toRecord(value: unknown): Record<string, unknown> {

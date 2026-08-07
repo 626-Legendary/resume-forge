@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { JetBrains_Mono, Orbitron } from "next/font/google";
 import { useSyncExternalStore } from "react";
 import { FaArrowLeft, FaFilePdf, FaPrint } from "react-icons/fa";
 
@@ -26,7 +27,43 @@ type ExportState =
       templateId: ResumeTemplateId;
     };
 
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-orbitron",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-mono",
+});
+
 const SERVER_RESUME_SNAPSHOT = "__resume_forge_server_snapshot__";
+
+const exportThemeStyles = `
+  :root {
+    --rf-bg: #07090c;
+    --rf-panel: #10151b;
+    --rf-panel-2: #151b23;
+    --rf-panel-3: #0b1016;
+    --rf-line: rgba(249, 115, 22, 0.28);
+    --rf-line-soft: rgba(148, 163, 184, 0.16);
+    --rf-orange: #f97316;
+    --rf-orange-soft: rgba(249, 115, 22, 0.12);
+    --rf-amber: #ffb454;
+    --rf-text: #f4f4f5;
+    --rf-muted: #8b949e;
+    --rf-danger: #fb7185;
+    --rf-success: #4ade80;
+  }
+
+  .rf-brand-font {
+    font-family: var(--font-orbitron), sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+`;
 
 const ExportResumeView = () => {
   const storedResumeJson = useSyncExternalStore(
@@ -79,7 +116,7 @@ const ExportResumeView = () => {
               className="mx-auto h-auto w-[170px] sm:w-[220px]"
             />
 
-            <p className="mt-5 font-[var(--font-orbitron)] text-sm font-bold uppercase tracking-[0.22em] text-red-400">
+            <p className="mt-5 font-[var(--font-orbitron)] text-sm font-bold uppercase tracking-[0.22em] text-red-400 sm:text-base">
               Export Failed
             </p>
 
@@ -101,7 +138,11 @@ const ExportResumeView = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#07090c] text-white">
+    <>
+      <style jsx global>{exportThemeStyles}</style>
+      <main
+        className={`${orbitron.variable} ${jetbrainsMono.variable} rf-workspace min-h-screen bg-[var(--rf-bg)] font-[var(--font-mono)] text-[var(--rf-text)]`}
+      >
       <header className="print:hidden relative z-10 border-b border-orange-500/25 bg-[#0b1016]/88 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1720px] items-center justify-between gap-4 px-4 py-4 sm:px-5 md:px-7">
           <div className="flex min-w-0 items-center gap-4 md:gap-5">
@@ -114,10 +155,10 @@ const ExportResumeView = () => {
             />
 
             <div className="hidden min-w-0 border-l border-zinc-700/80 pl-5 lg:block">
-              <p className="font-[var(--font-orbitron)] text-sm font-bold uppercase tracking-[0.28em] text-zinc-100">
+              <p className="rf-brand-font text-sm font-bold uppercase tracking-[0.28em] text-zinc-100">
                 Export Preview
               </p>
-              <p className="mt-1 text-xs font-medium text-zinc-500">
+              <p className="mt-1 text-xs font-medium text-[var(--rf-muted)]">
                 Print this page or save it as a PDF.
               </p>
             </div>
@@ -135,11 +176,11 @@ const ExportResumeView = () => {
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex items-center justify-center gap-2 border border-orange-400 bg-orange-500 px-3 py-2 font-[var(--font-orbitron)] text-[11px] font-extrabold uppercase tracking-[0.14em] text-black transition hover:bg-orange-400 sm:px-4 sm:text-xs"
+              className="rf-brand-font inline-flex items-center justify-center gap-2 border border-orange-400 bg-[var(--rf-orange)] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.14em] text-black transition hover:bg-orange-400 sm:px-4 sm:text-xs sm:tracking-[0.18em]"
             >
               <FaPrint className="text-xs" />
-              <span className="hidden sm:inline">Print / Save PDF</span>
-              <span className="sm:hidden">Print</span>
+              <span className="hidden sm:inline">Export PDF</span>
+              <span className="sm:hidden">PDF</span>
             </button>
           </div>
         </div>
@@ -171,7 +212,8 @@ const ExportResumeView = () => {
           />
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 };
 
