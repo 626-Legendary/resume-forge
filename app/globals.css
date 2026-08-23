@@ -2,7 +2,7 @@
 
 /* base */
 
-.page {
+.resume-document.page {
   font-family: Arial, Helvetica, sans-serif;
   background: white;
   color: black;
@@ -14,61 +14,61 @@
   box-sizing: border-box;
 }
 
-.page * {
+.resume-document.page * {
   margin: 0;
   padding: 0;
   align-items: center;
 }
 
-.page span{
+.resume-document.page span{
   @apply inline-block text-sm text-center leading-tight;
 }
 
 /* Name */
-.page h1 {
+.resume-document.page h1 {
   @apply block text-xl font-bold leading-tight;
 }
 
 /* Section */
-.page h2 {
+.resume-document.page h2 {
   @apply block font-bold border-b-2 leading-tight my-0.5; 
 }
 
 /* Job Company */
-.page h3 {
+.resume-document.page h3 {
   @apply inline text-sm font-semibold leading-none;
 }
 
 /* Job Title */
-.page h4 {
+.resume-document.page h4 {
   @apply block text-sm italic leading-tight;
 }
 
-.page ul {
+.resume-document.page ul {
   @apply pl-4;
 }
 
-.page li {
+.resume-document.page li {
   @apply list-disc text-sm text-justify leading-tight;
 }
 
-.info {
+.resume-document .info {
   @apply flex flex-wrap justify-center items-center gap-x-2 text-sm leading-tight;
 }
 
-.info p {
+.resume-document .info p {
   @apply text-sm text-center leading-tight;
 }
 
-.info p:not(:last-child)::after {
+.resume-document .info p:not(:last-child)::after {
   content: "|";
   margin-left: 8px;
 }
 
-section p {
+.resume-document section p {
   @apply text-sm text-justify leading-tight content-center;
 }
 
-.company {
+.resume-document .company {
   @apply flex justify-between
 }

@@ -415,6 +415,19 @@ npm run build
 * Better print margin controls
 * More export presets such as Letter and A4
 
+## Updates
+
+### [1.0.3] - 2026-08-22
+- **Fixed:** Resolved rendering issues for better layout consistency.
+- **Added:** Introduced `PrivateDashboard` mode — a minimalist, distraction-free interface designed for privacy-sensitive resume submissions.
+
+### [1.0.2]
+- **Changed:** Refactored the `resume.json` schema to support more flexible and comprehensive resume rendering.
+- **Added:** Integrated printable crop marks (crop lines) for professional PDF/print layout.
+
+### [1.0.1]
+- **Fixed:** Minor bug fixes and performance improvements.
+
 ## Author
 
 **Zexiang Zhang**

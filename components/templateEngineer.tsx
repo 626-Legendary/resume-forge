@@ -17,7 +17,7 @@ const ResumeTemplate = ({ data }: ResumeTemplateProps) => {
     const extraItems = getExtraEntries(contact?.extra);
 
     return (
-        <div className="page">
+        <div className="page resume-document">
             <header className="header">
                 <h1 className="text-center">{resumeData.basicInfo.name}</h1>
 

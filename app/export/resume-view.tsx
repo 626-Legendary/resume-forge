@@ -3,29 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { JetBrains_Mono, Orbitron } from "next/font/google";
-import { useSyncExternalStore } from "react";
 import { FaArrowLeft, FaFilePdf, FaPrint } from "react-icons/fa";
 
 import logoText from "@/public/logo-text.png";
-import ResumeTemplateRenderer from "@/components/resume-template-renderer";
-import { parseStoredResumeExport, RESUME_STORAGE_KEY } from "@/lib/resume";
-import type { ResumeTemplateId } from "@/lib/resume-template";
-import type { ResumeData } from "@/types/resume";
-
-type ExportState =
-  | {
-      status: "loading";
-      message: string;
-    }
-  | {
-      status: "error";
-      message: string;
-    }
-  | {
-      status: "ready";
-      resumeData: ResumeData;
-      templateId: ResumeTemplateId;
-    };
+import ResumePrintDocument from "@/components/resume-print-document";
+import { useStoredResumeExport } from "@/components/use-stored-resume-export";
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -38,8 +20,6 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600", "700"],
   variable: "--font-mono",
 });
-
-const SERVER_RESUME_SNAPSHOT = "__resume_forge_server_snapshot__";
 
 const exportThemeStyles = `
   :root {
@@ -66,12 +46,7 @@ const exportThemeStyles = `
 `;
 
 const ExportResumeView = () => {
-  const storedResumeJson = useSyncExternalStore(
-    subscribeToResumeStorage,
-    getStoredResumeJson,
-    getServerStoredResumeJson
-  );
-  const exportState = getExportState(storedResumeJson);
+  const exportState = useStoredResumeExport();
 
   const handlePrint = () => {
     window.print();
@@ -186,30 +161,19 @@ const ExportResumeView = () => {
         </div>
       </header>
 
-      <section className="print:hidden px-4 py-8 sm:px-5 md:px-7">
+      <section className="px-4 py-8 print:px-0 print:py-0 sm:px-5 md:px-7">
         <div className="mx-auto max-w-[1720px]">
-          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-zinc-500">
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-zinc-500 print:hidden">
             <FaFilePdf className="text-orange-400" />
             <span>Use Ctrl + P on Windows or Command + P on Mac.</span>
           </div>
 
-          <div className="mx-auto w-fit bg-white p-4 text-black shadow-[0_24px_80px_rgba(0,0,0,0.55)] sm:p-6">
-            <div className="resume-print-area">
-              <ResumeTemplateRenderer
-                data={exportState.resumeData}
-                templateId={exportState.templateId}
-              />
-            </div>
+          <div className="mx-auto w-fit bg-white p-4 text-black shadow-[0_24px_80px_rgba(0,0,0,0.55)] print:p-0 print:shadow-none sm:p-6">
+            <ResumePrintDocument
+              data={exportState.resumeData}
+              templateId={exportState.templateId}
+            />
           </div>
-        </div>
-      </section>
-
-      <section className="hidden print:block">
-        <div className="resume-print-area">
-          <ResumeTemplateRenderer
-            data={exportState.resumeData}
-            templateId={exportState.templateId}
-          />
         </div>
       </section>
       </main>
@@ -219,48 +183,3 @@ const ExportResumeView = () => {
 
 export default ExportResumeView;
 
-function subscribeToResumeStorage(onStoreChange: () => void) {
-  window.addEventListener("storage", onStoreChange);
-  return () => window.removeEventListener("storage", onStoreChange);
-}
-
-function getStoredResumeJson() {
-  return window.localStorage.getItem(RESUME_STORAGE_KEY);
-}
-
-function getServerStoredResumeJson() {
-  return SERVER_RESUME_SNAPSHOT;
-}
-
-function getExportState(storedResumeJson: string | null): ExportState {
-  if (storedResumeJson === SERVER_RESUME_SNAPSHOT) {
-    return {
-      status: "loading",
-      message: "Loading resume preview...",
-    };
-  }
-
-  if (!storedResumeJson) {
-    return {
-      status: "error",
-      message:
-        "No resume data found. Please go back to the dashboard, parse your resume JSON, and export again.",
-    };
-  }
-
-  try {
-    const storedResumeExport = parseStoredResumeExport(storedResumeJson);
-
-    return {
-      status: "ready",
-      resumeData: storedResumeExport.resumeData,
-      templateId: storedResumeExport.templateId,
-    };
-  } catch {
-    return {
-      status: "error",
-      message:
-        "Resume data is invalid. Please return to the dashboard and export again.",
-    };
-  }
-}

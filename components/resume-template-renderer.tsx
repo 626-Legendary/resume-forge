@@ -12,19 +12,15 @@ type ResumeTemplateRendererProps = {
   templateId: ResumeTemplateId;
 };
 
-const PAGE_HEIGHTS = {
-  letter: 11 * 96,
-  a4: (297 / 25.4) * 96,
+const PAPER_ASPECT_RATIOS = {
+  letter: 11 / 8.5,
+  a4: 297 / 210,
 };
 
-const PAGE_CROP_OFFSET = {
-  letter: 20,
-  a4: 64,
-};
-
-const PAPER_LINE_TOP = {
-  letter: PAGE_HEIGHTS.letter + PAGE_CROP_OFFSET.letter,
-  a4: PAGE_HEIGHTS.a4 + PAGE_CROP_OFFSET.a4,
+const DEFAULT_PAGE_WIDTH = 8.5 * 96;
+const DEFAULT_PAGE_HEIGHTS = {
+  letter: DEFAULT_PAGE_WIDTH * PAPER_ASPECT_RATIOS.letter,
+  a4: DEFAULT_PAGE_WIDTH * PAPER_ASPECT_RATIOS.a4,
 };
 
 const templates: Record<
@@ -44,6 +40,7 @@ const ResumeTemplateRenderer = ({
     letter: false,
     a4: false,
   });
+  const [paperHeights, setPaperHeights] = useState(DEFAULT_PAGE_HEIGHTS);
 
   useEffect(() => {
     const page = wrapperRef.current?.querySelector(".page");
@@ -51,11 +48,15 @@ const ResumeTemplateRenderer = ({
 
     const updateCutoffState = () => {
       const contentHeight = page.scrollHeight || page.clientHeight || 0;
+      const pageWidth = page.getBoundingClientRect().width || DEFAULT_PAGE_WIDTH;
+      const letterHeight = pageWidth * PAPER_ASPECT_RATIOS.letter;
+      const a4Height = pageWidth * PAPER_ASPECT_RATIOS.a4;
 
       setCutoffState({
-        letter: contentHeight > PAGE_HEIGHTS.letter + PAGE_CROP_OFFSET.letter,
-        a4: contentHeight > PAGE_HEIGHTS.a4 + PAGE_CROP_OFFSET.a4,
+        letter: contentHeight > letterHeight,
+        a4: contentHeight > a4Height,
       });
+      setPaperHeights({ letter: letterHeight, a4: a4Height });
     };
 
     updateCutoffState();
@@ -78,17 +79,17 @@ const ResumeTemplateRenderer = ({
         <div className="pointer-events-none absolute inset-0 z-10 print:hidden">
           <div
             className="absolute left-0 text-[10px] font-medium tracking-[0.18em] text-zinc-500"
-            style={{ top: `${PAPER_LINE_TOP.a4 - 8}px` }}
+            style={{ top: `${paperHeights.a4 - 8}px` }}
           >
             ✂
           </div>
           <div
             className="absolute inset-x-0 border-t border-dashed border-zinc-400/80"
-            style={{ top: `${PAPER_LINE_TOP.a4}px` }}
+            style={{ top: `${paperHeights.a4}px` }}
           />
           <div
             className="absolute right-0 text-right text-[10px] font-medium tracking-[0.18em] text-zinc-500"
-            style={{ top: `${PAPER_LINE_TOP.a4 - 8}px` }}
+            style={{ top: `${paperHeights.a4 - 8}px` }}
           >
             A4
           </div>
@@ -99,17 +100,17 @@ const ResumeTemplateRenderer = ({
         <div className="pointer-events-none absolute inset-0 z-10 print:hidden">
           <div
             className="absolute left-0 text-[10px] font-medium tracking-[0.18em] text-zinc-500"
-            style={{ top: `${PAPER_LINE_TOP.letter - 8}px` }}
+            style={{ top: `${paperHeights.letter - 8}px` }}
           >
             ✂
           </div>
           <div
             className="absolute inset-x-0 border-t border-dashed border-zinc-400/80"
-            style={{ top: `${PAPER_LINE_TOP.letter}px` }}
+            style={{ top: `${paperHeights.letter}px` }}
           />
           <div
             className="absolute right-0 text-right text-[10px] font-medium tracking-[0.18em] text-zinc-500"
-            style={{ top: `${PAPER_LINE_TOP.letter - 8}px` }}
+            style={{ top: `${paperHeights.letter - 8}px` }}
           >
             US LETTER
           </div>
