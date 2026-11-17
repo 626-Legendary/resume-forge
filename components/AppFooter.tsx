@@ -3,11 +3,12 @@ import Image from "next/image";
 import { FaCoffee, FaEnvelope, FaGithub } from "react-icons/fa";
 import { app_version } from "@/constants/metaData";
 import logo from "@/public/logo.png";
+import { githubRepositoryUrl } from "@/lib/site";
 
 const footerLinks = [
   {
     label: "GitHub",
-    href: "https://github.com/626-Legendary",
+    href: githubRepositoryUrl,
     icon: FaGithub,
     external: true,
   },
@@ -40,8 +41,6 @@ const AppFooter = () => {
       />
 
       <div className="relative mx-auto max-w-[1720px]">
-        
-
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
             <div className="flex items-center gap-3">
@@ -62,16 +61,17 @@ const AppFooter = () => {
 
               <div className="min-w-0">
                 <p className="font-[var(--font-orbitron)] text-sm font-black uppercase tracking-[0.24em] text-orange-400 sm:tracking-[0.28em]">
-                  Resume Forge <span className="text-xs tracking-[0.1em]">v{app_version}</span>
+                  Resume Forge{" "}
+                  <span className="text-xs tracking-[0.1em]">
+                    v{app_version}
+                  </span>
                 </p>
-                
 
                 <p className="mt-1 hidden font-[var(--font-mono)] text-[11px] uppercase tracking-[0.16em] text-zinc-600 sm:block">
                   JSON to print-ready resume
                 </p>
               </div>
             </div>
-
           </div>
 
           <nav
@@ -96,9 +96,8 @@ const AppFooter = () => {
             })}
           </nav>
         </div>
-        <div className="my-5 h-px w-full bg-gradient-to-r from-transparent via-orange-500/45 to-transparent" />    
+        <div className="my-5 h-px w-full bg-gradient-to-r from-transparent via-orange-500/45 to-transparent" />
         <div className="flex flex-col gap-4 border-zinc-800 font-[var(--font-mono)] text-xs leading-5 text-zinc-600 md:flex-row md:items-end md:justify-between">
-          
           <div>
             <p>
               Copyright {new Date().getFullYear()} Resume Forge. All rights

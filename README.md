@@ -1,4 +1,4 @@
-# Resume Forge 1.0.5
+# Resume Forge 1.0.6
 
 A JSON-powered resume builder for AI-assisted job applications. Paste structured content, review every US Letter page, and download the same PDF shown in the preview.
 
@@ -6,7 +6,16 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 
 ![Resume Forge](./public/og-image.png)
 
-## What changed in 1.0.5
+## What changed in 1.0.6
+
+- Rename the dashboard toggle to **Light mode on/off**, preserving existing saved preferences and the light interface's motion-free behavior.
+- Separate Font sizes and Spacing with a visible divider in both themes.
+- Rewrite **JSON format and tips** around a complete, copyable content framework: contact/profile fields, summary, all skill categories, experience, projects, education and certifications. The writing guide omits export-only metadata and avoids special instructions about it. The underlying input schema and filename behavior remain supported.
+- Add the existing logo beside the dashboard title, with a compact JSON-to-PDF caption and release version.
+- Highlight **An independent personal project — built by Zexiang Zhang** in the dashboard footer, linking directly to the [Resume Forge repository](https://github.com/626-Legendary/resume-forge).
+- Refresh the landing hero with clear workflow copy, a direct builder action, valid JSON and a readable resume example. Preserve the dark orange palette, grid effects, Orbitron headings and JetBrains Mono typography.
+
+## 1.0.5 improvements
 
 - Add optional `basicInfo["company-name"]` immediately after `name` in the JSON schema. It supplies the PDF filename prefix and is excluded from the resume body and text preview. The manual Company name input has been removed.
 - Add independent **Name**, **Section titles** and **Body text** font-size controls, defaulting to **14pt**, **12pt** and **10pt**. Choose 6–32pt in 0.5pt increments. Body size includes contact information, entry headings, links and bullets.
@@ -20,7 +29,7 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 ## Core features
 
 - A focused two-panel dashboard replaces the crowded three-column console, repeated controls and scanning/pulsing effects.
-- **Simple mode** on `/dashboard` uses light surfaces and disables animations, transitions and smooth scrolling. The preference is remembered in this browser.
+- **Light mode** on `/dashboard` uses light surfaces and disables animations, transitions and smooth scrolling. The preference is remembered in this browser, including preferences saved before the toggle was renamed.
 - **Real paginated PDF preview** replaces crop lines. Each sheet is US Letter (612 × 792 points / 8.5 × 11 inches), with a page count and `Page n of N` labels.
 - Preview and download use the **same PDF bytes**. No browser print dialog or screenshot-to-PDF conversion is needed.
 - **Export PDF** downloads `Company_Full_Name_Mon_DD.pdf`, for example `Apple_Zexiang_Zhang_Nov_16.pdf`. The optional JSON field `basicInfo["company-name"]` controls the prefix; it never appears in the resume. An omitted or blank company uses `Resume`. Dates use the user's local date when clicking export, English month abbreviations and a two-digit day.
@@ -28,7 +37,7 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 - Shared content, layout, rendering and builder modules replace duplicate dashboards, HTML templates and export implementations.
 - Updated Next.js to 16.4.6 and refreshed compatible dependencies to address the existing dependency audit findings.
 
-The original design specification and UI audit are in [docs/UIUX-1.0.4.md](./docs/UIUX-1.0.4.md). The current company metadata and typography requirements are in [docs/UIUX-1.0.5.md](./docs/UIUX-1.0.5.md).
+Design specifications are in [docs/UIUX-1.0.4.md](./docs/UIUX-1.0.4.md), [docs/UIUX-1.0.5.md](./docs/UIUX-1.0.5.md) and the current [1.0.6 interface update](./docs/UIUX-1.0.6.md).
 
 ## Get started
 
@@ -148,9 +157,9 @@ The current PDF font targets English and Western Latin resumes. CJK scripts and 
 
 Downloaded PDF hyperlinks use standard URI actions. Whether a website opens in the same tab, a new tab or another browser window is controlled by the PDF reader/browser and its preferences. A website URI action has no portable equivalent of HTML `target="_blank"`; the PDF `NewWindow` flag applies to other action types and cannot reliably force website links into a new window across readers. See Adobe's [PDF Reference, URI Actions, pp. 602–603](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.5_v6.pdf#page=624). The app preserves clickable URLs without adding reader-specific JavaScript actions.
 
-Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content, font sizes and spacing in memory and stores only the simple-mode preference. Reloading clears your current input and restores layout defaults. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
+Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content, font sizes and spacing in memory and stores only the light-mode preference. Reloading clears your current input and restores layout defaults. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
 
-`/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts legacy raw resumes and `{ resumeData, templateId, fontSizes?, spacing? }` payloads, uses the same PDF pipeline and offers a download link. `fontSizes` has `{ name, section, body }` numeric values and `spacing` has `{ lineHeight, paragraph, section }`; missing or invalid individual settings use their defaults. A legacy 1.0.4 `companyName` is migrated only when `basicInfo` has no `company-name` field; an explicit new value, including an empty string, takes precedence. The main dashboard downloads directly and does not write resumes to local storage. Simple mode is a visual preference, not an authentication or privacy boundary.
+`/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts legacy raw resumes and `{ resumeData, templateId, fontSizes?, spacing? }` payloads, uses the same PDF pipeline and offers a download link. `fontSizes` has `{ name, section, body }` numeric values and `spacing` has `{ lineHeight, paragraph, section }`; missing or invalid individual settings use their defaults. A legacy 1.0.4 `companyName` is migrated only when `basicInfo` has no `company-name` field; an explicit new value, including an empty string, takes precedence. The main dashboard downloads directly and does not write resumes to local storage. Light mode is a visual preference, not an authentication or privacy boundary.
 
 ## Architecture
 
@@ -166,6 +175,7 @@ Resume parsing, PDF generation and previews run in the browser. The dashboard ke
 | `lib/resume-typography.ts`           | Font defaults, supported sizes and stored-setting validation                       |
 | `lib/resume-spacing.ts`              | Line, paragraph and section spacing defaults, options and validation               |
 | `components/resume-builder.tsx`      | Shared dashboard UI and download interaction                                       |
+| `components/resume-json-help.tsx`    | Complete content framework and copyable JSON writing guide                         |
 | `components/resume-export-view.tsx`  | Shared legacy export UI                                                            |
 
 The PDF worker is copied from the installed PDF.js package by `scripts/copy-pdf-worker.mjs` during install, development and build. It is served locally and ignored by Git; no runtime CDN dependency is needed for PDF rendering.
@@ -188,6 +198,7 @@ Playwright tests exercise mode persistence and motion suppression, JSON company-
 
 ## Earlier releases
 
+- **1.0.5** — JSON-based company metadata, independent font sizes, compact profile links, bold Skills labels, spacing controls and separate layout reset actions.
 - **1.0.4** — Actual paginated Letter PDF preview/download, simple mode, shared rendering modules, private-route removal, regression tests and dependency security updates.
 - **1.0.3** — Layout fixes and the original PrivateDashboard interface.
 - **1.0.2** — Expanded resume schema and print crop lines (replaced by actual pagination in 1.0.4).

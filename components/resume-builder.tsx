@@ -1,5 +1,10 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
+import { FaGithub } from "react-icons/fa";
+import logo from "@/public/logo.png";
+import ResumeJsonHelp from "@/components/resume-json-help";
+import { creatorName, githubRepositoryUrl } from "@/lib/site";
 import { useState, useSyncExternalStore } from "react";
 import { useBuilder } from "@/components/use-builder";
 import { useResumePdf } from "@/components/use-resume-pdf";
@@ -33,9 +38,9 @@ function getMode() {
 }
 export default function ResumeBuilder() {
   const builder = useBuilder();
-  const savedSimple = useSyncExternalStore(subscribe, getMode, () => false);
+  const savedLight = useSyncExternalStore(subscribe, getMode, () => false);
   const [modeOverride, setModeOverride] = useState<boolean | null>(null);
-  const simple = modeOverride ?? savedSimple;
+  const light = modeOverride ?? savedLight;
   const [revision, setRevision] = useState(0);
   const {
     artifact,
@@ -50,9 +55,9 @@ export default function ResumeBuilder() {
   );
   const [downloadError, setDownloadError] = useState("");
   function toggleMode() {
-    setModeOverride(!simple);
+    setModeOverride(!light);
     try {
-      localStorage.setItem(MODE_KEY, String(!simple));
+      localStorage.setItem(MODE_KEY, String(!light));
       window.dispatchEvent(new Event("resume-mode"));
     } catch {
       /* Session preference remains available. */
@@ -76,13 +81,21 @@ export default function ResumeBuilder() {
     }
   }
   return (
-    <main className="builder" data-mode={simple ? "simple" : "dark"}>
+    <main className="builder" data-mode={light ? "simple" : "dark"}>
       <header className="builder-header">
-        <Link href="/" className="builder-brand">
-          Resume Forge <span>v{app_version}</span>
+        <Link href="/" className="builder-brand" aria-label="Resume Forge home">
+          <span className="builder-brand-mark">
+            <Image src={logo} alt="" width={40} height={40} priority />
+          </span>
+          <span className="builder-brand-copy">
+            <span className="builder-brand-title">Resume Forge</span>
+            <span className="builder-brand-meta">
+              JSON to PDF <span aria-hidden="true">·</span> v{app_version}
+            </span>
+          </span>
         </Link>
-        <button type="button" aria-pressed={simple} onClick={toggleMode}>
-          Simple mode {simple ? "on" : "off"}
+        <button type="button" aria-pressed={light} onClick={toggleMode}>
+          Light mode {light ? "on" : "off"}
         </button>
       </header>
       <div className="builder-intro">
@@ -190,6 +203,7 @@ export default function ResumeBuilder() {
                 automatically.
               </p>
             </fieldset>
+            <hr className="settings-divider" />
             <fieldset className="font-size-controls">
               <legend>Spacing</legend>
               <button
@@ -228,43 +242,7 @@ export default function ResumeBuilder() {
               </p>
             </fieldset>
           </div>
-          <details className="builder-help">
-            <summary>JSON format and tips</summary>
-            <p>
-              Use basicInfo.name and optional summary, skills, experiences,
-              projects, education and certifications. Empty sections are
-              omitted.
-            </p>
-            <p>
-              Set <code>{'basicInfo["company-name"]'}</code> for the PDF
-              filename. It is not printed on your resume.
-            </p>
-            <p>
-              Generate content using the schema below, then paste it into JSON
-              Input.
-            </p>
-            <pre className="schema-example">
-              {JSON.stringify(
-                {
-                  basicInfo: {
-                    name: "Your Name",
-                    "company-name": "Apple",
-                    contact: { tel: "", email: "", location: "" },
-                  },
-                  summary: "",
-                  skills: { Languages: ["TypeScript"] },
-                  experiences: [
-                    { company: "", title: "", date: "", description: [] },
-                  ],
-                  projects: [],
-                  education: [],
-                  certifications: [],
-                },
-                null,
-                2,
-              )}
-            </pre>
-          </details>
+          <ResumeJsonHelp />
         </section>
         <section
           className="builder-panel preview-panel"
@@ -330,8 +308,27 @@ export default function ResumeBuilder() {
         </section>
       </div>
       <footer className="builder-footer">
-        Your resume is generated in this browser.{" "}
-        <span>Resume Forge · v{app_version}</span>
+        <div className="builder-footer-author">
+          <p className="eyebrow">An independent personal project</p>
+          <p>
+            Built by <strong>{creatorName}</strong>.
+          </p>
+          <p className="muted">
+            Created to make resume iteration easier. Your PDF is generated in
+            this browser.
+          </p>
+        </div>
+        <div className="builder-footer-links">
+          <a
+            href={githubRepositoryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaGithub aria-hidden="true" />
+            View source on GitHub
+          </a>
+          <span>Resume Forge · v{app_version}</span>
+        </div>
       </footer>
     </main>
   );

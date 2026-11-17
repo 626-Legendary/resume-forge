@@ -25,4 +25,6 @@ export const siteKeywords = [
   "resume generator",
 ];
 export const githubProfileUrl = "https://github.com/626-Legendary";
+export const githubRepositoryUrl =
+  "https://github.com/626-Legendary/resume-forge";
 export const creatorName = "Zexiang Zhang";

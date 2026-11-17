@@ -2,11 +2,29 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { FaCode, FaFilePdf, FaGithub, FaHammer } from "react-icons/fa";
+import { FaCode, FaFilePdf, FaGithub } from "react-icons/fa";
 import { JetBrains_Mono, Orbitron } from "next/font/google";
 
 import AppFooter from "@/components/AppFooter";
 import logoText from "@/public/logo-text.png";
+import { githubRepositoryUrl } from "@/lib/site";
+
+const heroResumeInput = JSON.stringify(
+  {
+    basicInfo: { name: "Alex Morgan", contact: { email: "alex@example.com" } },
+    summary: "Software engineer building useful products.",
+    skills: { Languages: ["TypeScript", "Python"] },
+    experiences: [
+      {
+        company: "Acme",
+        title: "Software Engineer",
+        description: ["Built reliable tools for growing teams."],
+      },
+    ],
+  },
+  null,
+  2,
+);
 
 const orbitron = Orbitron({
   subsets: ["latin"],
@@ -163,7 +181,7 @@ export default function Home() {
 
             <nav className="flex shrink-0 items-center gap-2 sm:gap-3">
               <Link
-                href="https://github.com/626-Legendary"
+                href={githubRepositoryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rf-brand-font hidden border border-zinc-700 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-zinc-300 transition hover:border-orange-400 hover:text-orange-400 sm:inline-flex"
@@ -182,22 +200,28 @@ export default function Home() {
         </header>
 
         {/* Hero */}
-        <section className="relative z-10 flex min-h-[calc(100vh-73px)] items-center">
+        <section
+          aria-labelledby="hero-title"
+          className="relative z-10 flex min-h-[calc(100vh-73px)] items-center"
+        >
           <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 px-4 py-14 sm:px-5 md:px-8 md:py-16 lg:grid-cols-[1fr_0.92fr] lg:items-center">
             <div className="rf-rise">
               <p className="rf-brand-font text-[10px] font-bold uppercase tracking-[0.22em] text-orange-400 sm:text-xs sm:tracking-[0.4em]">
-                JSON to print-ready resume
+                Your content. A resume ready to send.
               </p>
 
-              <h1 className="rf-brand-font mt-3 max-w-[9ch] text-[2.6rem] font-extrabold uppercase leading-[0.9] tracking-[0.035em] text-zinc-100 sm:mt-5 sm:max-w-none sm:text-6xl md:text-7xl lg:text-8xl">
-                Resume
-                <span className="block text-orange-500">Forge</span>
+              <h1
+                id="hero-title"
+                className="rf-brand-font mt-4 text-[2.2rem] font-extrabold uppercase leading-[1.1] tracking-[0.025em] text-zinc-100 sm:mt-5 sm:text-5xl md:text-6xl lg:text-[3.4rem]"
+              >
+                Tailor faster.
+                <span className="block text-orange-500">Apply sooner.</span>
               </h1>
 
               <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-zinc-300 sm:mt-6 sm:max-w-2xl sm:text-base sm:leading-7 md:text-xl md:leading-8">
-                Turn AI-generated resume JSON into an ATS-friendly,
-                print-ready resume. Copy, paste, preview, and export without
-                manually rebuilding layouts.
+                Turn your AI-tailored content into a clean, ATS-friendly PDF.
+                Paste your JSON, review every US Letter page, and download the
+                resume you see. Spend your time on the next application.
               </p>
 
               <div className="mt-8 flex w-full flex-col gap-3 sm:mt-9 sm:w-auto sm:flex-row">
@@ -205,23 +229,34 @@ export default function Home() {
                   href="/dashboard"
                   className="rf-brand-font rf-glow inline-flex w-full items-center justify-center border border-orange-300 bg-orange-500 px-5 py-4 text-xs font-extrabold uppercase tracking-[0.18em] text-black transition hover:bg-orange-400 sm:w-auto sm:px-6 sm:text-sm"
                 >
-                  Start Forging
+                  Build my resume
                 </Link>
 
                 <Link
-                  href="https://github.com/626-Legendary"
+                  href={githubRepositoryUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rf-brand-font inline-flex w-full items-center justify-center gap-2 border border-zinc-700 bg-[#0b1016] px-5 py-4 text-xs font-bold uppercase tracking-[0.14em] text-zinc-300 transition hover:border-orange-400 hover:text-orange-400 sm:w-auto sm:px-6 sm:text-sm"
                 >
                   <FaGithub />
-                  View GitHub
+                  View source
                 </Link>
               </div>
 
-              <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500 sm:mt-6 sm:text-sm sm:tracking-[0.22em]">
-                Apply faster. Tailor smarter. Land sooner.
+              <p className="mt-4 text-xs leading-6 text-zinc-400 sm:text-sm">
+                No account needed. Your resume stays in your browser.
               </p>
+              <ol className="mt-8 grid grid-cols-3 gap-3 border-t border-orange-500/25 pt-5 text-xs leading-5 text-zinc-300 sm:text-sm">
+                <li>
+                  <span className="block text-orange-400">01</span>Paste JSON
+                </li>
+                <li>
+                  <span className="block text-orange-400">02</span>Review pages
+                </li>
+                <li>
+                  <span className="block text-orange-400">03</span>Download PDF
+                </li>
+              </ol>
             </div>
 
             {/* Product visual */}
@@ -230,11 +265,11 @@ export default function Home() {
                 <div className="flex items-center justify-between gap-4 border-b border-orange-500/20 bg-[#111820] px-4 py-4 sm:px-5">
                   <div className="min-w-0">
                     <p className="rf-brand-font text-[10px] font-bold uppercase tracking-[0.24em] text-orange-400 sm:tracking-[0.28em]">
-                      
+                      Content in. Resume out.
                     </p>
 
                     <p className="rf-brand-font mt-1 truncate text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 sm:text-[11px] md:text-xs">
-                      Input -&gt; Parse -&gt; Preview -&gt; Export
+                      One layout. Every page accounted for.
                     </p>
                   </div>
 
@@ -243,8 +278,8 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-[0.88fr_1.12fr]">
-                  <div className="border-b border-orange-500/15 p-4 sm:p-5 md:border-b-0 md:border-r">
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]">
+                  <div className="min-w-0 border-b border-orange-500/15 p-4 sm:p-5 md:border-b-0 md:border-r">
                     <div className="mb-4 flex items-center gap-2 text-orange-400">
                       <FaCode />
                       <p className="rf-brand-font text-xs font-bold uppercase tracking-[0.16em] sm:tracking-[0.18em]">
@@ -252,77 +287,61 @@ export default function Home() {
                       </p>
                     </div>
 
-                    <div className="rf-code-font space-y-2 text-[11px] leading-5 text-zinc-400 sm:text-xs">
-                      <p>{`{`}</p>
-                      <p className="pl-4 text-orange-300">{`"basicInfo": {`}</p>
-                      <p className="pl-8">{`"name": "Your Name",`}</p>
-                      <p className="pl-8">{`"email": "you@email.com"`}</p>
-                      <p className="pl-4 text-orange-300">{`},`}</p>
-                      <p className="pl-4 text-orange-300">{`"skills": { ... },`}</p>
-                      <p className="hidden pl-4 text-orange-300 sm:block">{`"projects": [ ... ]`}</p>
-                      <p>{`}`}</p>
-                    </div>
-
-                    <div className="mt-6 grid gap-3">
-                      <div className="rf-brand-font flex items-center gap-2 border border-orange-500/30 bg-orange-500/10 px-3 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-orange-400 sm:text-xs">
-                        <FaHammer />
-                        Parse JSON
-                      </div>
-
-                      <div className="rf-brand-font border border-zinc-700 px-3 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-400 sm:text-xs">
-                        Load Mock Data
-                      </div>
-                    </div>
+                    <pre
+                      aria-label="Example resume JSON"
+                      className="rf-code-font max-h-[300px] overflow-auto whitespace-pre-wrap break-words text-[11px] leading-5 text-zinc-400 sm:text-xs"
+                    >
+                      {heroResumeInput}
+                    </pre>
+                    <p className="mt-5 border-t border-zinc-800 pt-4 text-xs leading-5 text-zinc-400">
+                      Your words and achievements. Consistent formatting for
+                      every application.
+                    </p>
                   </div>
 
-                  <div className="bg-[#d8d3ca] p-4 sm:p-6">
-                    <div className="min-h-[360px] bg-white p-5 text-black shadow-[0_20px_60px_rgba(0,0,0,0.25)] sm:min-h-[430px] sm:p-7">
-                      <div className="border-b-2 border-black pb-4">
-                        <div className="h-7 w-36 bg-zinc-900 sm:h-8 sm:w-40" />
-                        <div className="mt-2 h-3 w-24 bg-orange-700/80 sm:w-28" />
+                  <div className="min-w-0 bg-[#d8d3ca] p-4 sm:p-5">
+                    <article
+                      aria-label="Example resume preview"
+                      className="flex min-h-[360px] flex-col bg-white p-5 text-[11px] leading-[1.5] text-black shadow-[0_20px_60px_rgba(0,0,0,0.25)] sm:min-h-[430px]"
+                      style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+                    >
+                      <div className="mb-5 text-center">
+                        <h2 className="text-base font-bold">Alex Morgan</h2>
+                        <p className="mt-1 text-[10px]">alex@example.com</p>
                       </div>
-
-                      <div className="mt-6 space-y-5">
-                        <section>
-                          <div className="mb-3 h-3 w-20 bg-zinc-900" />
-                          <div className="space-y-2">
-                            <div className="h-2.5 w-full bg-zinc-300" />
-                            <div className="h-2.5 w-[92%] bg-zinc-300" />
-                            <div className="h-2.5 w-[76%] bg-zinc-300" />
-                          </div>
-                        </section>
-
-                        <section>
-                          <div className="mb-3 h-3 w-16 bg-zinc-900" />
-                          <div className="flex flex-wrap gap-2">
-                            <div className="h-2.5 w-14 bg-zinc-300 sm:w-16" />
-                            <div className="h-2.5 w-20 bg-zinc-300" />
-                            <div className="h-2.5 w-24 bg-zinc-300" />
-                            <div className="h-2.5 w-12 bg-zinc-300 sm:w-14" />
-                          </div>
-                        </section>
-
-                        <section>
-                          <div className="mb-3 h-3 w-24 bg-zinc-900" />
-                          <div className="space-y-2">
-                            <div className="h-2.5 w-[62%] bg-zinc-300" />
-                            <div className="h-2.5 w-full bg-zinc-300" />
-                            <div className="h-2.5 w-[84%] bg-zinc-300" />
-                          </div>
-                        </section>
-
-                        <section className="pt-2">
-                          <div className="flex items-center gap-2 text-orange-700">
-                            <FaFilePdf />
-                            <p className="rf-brand-font text-[10px] font-black uppercase tracking-[0.14em] sm:text-xs sm:tracking-[0.16em]">
-                              Export Ready
-                            </p>
-                          </div>
-                        </section>
-                      </div>
-                    </div>
+                      <section>
+                        <h3 className="mb-2 border-b border-black pb-1 font-bold">
+                          Summary
+                        </h3>
+                        <p>Software engineer building useful products.</p>
+                      </section>
+                      <section className="mt-4">
+                        <h3 className="mb-2 border-b border-black pb-1 font-bold">
+                          Skills
+                        </h3>
+                        <p>
+                          <strong>Languages:</strong> TypeScript, Python
+                        </p>
+                      </section>
+                      <section className="mt-4">
+                        <h3 className="mb-2 border-b border-black pb-1 font-bold">
+                          Experience
+                        </h3>
+                        <p className="font-bold">Acme</p>
+                        <p>Software Engineer</p>
+                        <p className="mt-2">
+                          • Built reliable tools for growing teams.
+                        </p>
+                      </section>
+                      <p className="mt-auto pt-6 text-[9px] tracking-wide text-zinc-500">
+                        US LETTER · PAGE 1
+                      </p>
+                    </article>
                   </div>
                 </div>
+                <p className="border-t border-orange-500/20 px-4 py-3 text-[11px] text-zinc-400 sm:px-5">
+                  Adjust fonts and spacing. Export the same PDF you preview.
+                </p>
 
                 <div className="absolute left-0 top-8 h-16 w-1.5 bg-orange-500 sm:-left-3 sm:h-20 sm:w-2" />
                 <div className="absolute bottom-8 right-0 h-16 w-1.5 bg-orange-500 sm:-right-3 sm:h-20 sm:w-2" />
@@ -410,8 +429,8 @@ export default function Home() {
                 </li>
                 <li className="border-l border-orange-500/40 pl-4">
                   <span className="text-orange-400">3.</span> Export the
-                  finished version and download the same paginated US Letter
-                  PDF you see in the preview.
+                  finished version and download the same paginated US Letter PDF
+                  you see in the preview.
                 </li>
               </ol>
 
@@ -424,7 +443,7 @@ export default function Home() {
                 </Link>
 
                 <Link
-                  href="https://github.com/626-Legendary"
+                  href={githubRepositoryUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rf-brand-font inline-flex items-center justify-center gap-2 border border-zinc-700 bg-[#0b1016] px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-zinc-300 transition hover:border-orange-400 hover:text-orange-400"

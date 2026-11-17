@@ -48,16 +48,38 @@
   border-bottom: 1px solid var(--border);
 }
 .builder-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
   font-size: 21px;
   font-weight: 750;
   letter-spacing: -0.5px;
   text-decoration: none;
 }
-.builder-brand span {
-  font-size: 12px;
+.builder-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border: 1px solid #a84c15;
+  border-radius: 10px;
+  background: #080d12;
+}
+.builder-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.builder-brand-title {
+  line-height: 1.2;
+}
+.builder-brand-meta {
+  font-size: 11px;
   color: var(--muted);
   font-weight: 400;
-  margin-left: 8px;
+  letter-spacing: 0.25px;
 }
 .builder-intro {
   padding: 32px 0;
@@ -189,6 +211,12 @@
 .builder-fields select {
   width: 100%;
 }
+.settings-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  width: 100%;
+  margin: 4px 0;
+}
 .font-size-controls legend {
   font-size: 14px;
   font-weight: 550;
@@ -215,6 +243,14 @@
   line-height: 1.8;
   color: var(--muted);
 }
+.schema-guide {
+  padding-left: 20px;
+  list-style: disc;
+  margin: 12px 0;
+}
+.builder-help > p {
+  margin: 12px 0;
+}
 .builder summary {
   cursor: pointer;
   padding: 8px 0;
@@ -226,6 +262,11 @@
   overflow: auto;
   max-width: 100%;
   font-size: 11px;
+  max-height: 440px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  background: var(--input);
+  border-radius: 6px;
 }
 .preview-panel > .panel-heading {
   padding: 20px 24px;
@@ -297,6 +338,32 @@
   margin-top: 24px;
   font-size: 12px;
   color: var(--muted);
+  border-top: 1px solid var(--border);
+  align-items: center;
+}
+.builder-footer-author > p {
+  margin: 6px 0;
+}
+.builder-footer-author > p:nth-child(2) {
+  font-size: 17px;
+  color: var(--text);
+}
+.builder-footer-author strong {
+  font-weight: 650;
+}
+.builder-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+.builder-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--accent);
+  font-size: 14px;
 }
 @media (max-width: 960px) {
   .builder-grid {
@@ -313,8 +380,22 @@
   .builder-brand {
     font-size: 17px;
   }
-  .builder-brand span {
-    display: none;
+  .builder-brand {
+    gap: 8px;
+  }
+  .builder-brand-mark {
+    width: 36px;
+    height: 40px;
+  }
+  .builder-brand-mark img {
+    width: 32px;
+    height: 32px;
+  }
+  .builder-brand-meta {
+    font-size: 10px;
+  }
+  .builder-footer-links {
+    align-items: flex-start;
   }
   .editor-panel {
     padding: 16px;

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import schema from "../../constants/default.json" with { type: "json" };
 
 let browserErrors: string[] = [];
 test.beforeEach(async ({ page }) => {
@@ -9,11 +10,11 @@ test.afterEach(() => {
   expect(browserErrors, "No uncaught browser runtime errors").toEqual([]);
 });
 
-test("simple mode persists, is light, and suppresses all motion", async ({
+test("light mode persists, is light, and suppresses all motion", async ({
   page,
 }) => {
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: "Simple mode off" }).click();
+  await page.getByRole("button", { name: "Light mode off" }).click();
   await expect(page.locator("main")).toHaveAttribute("data-mode", "simple");
   expect(
     await page.locator("main").evaluate((element) => {
@@ -31,9 +32,9 @@ test("simple mode persists, is light, and suppresses all motion", async ({
   });
   await page.reload();
   await expect(
-    page.getByRole("button", { name: "Simple mode on" }),
+    page.getByRole("button", { name: "Light mode on" }),
   ).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "Simple mode on" }).click();
+  await page.getByRole("button", { name: "Light mode on" }).click();
   await expect(page.locator("main")).toHaveAttribute("data-mode", "dark");
 });
 
@@ -146,7 +147,7 @@ test("font controls update actual downloaded PDF and reset to 14/12/10", async (
 test("validation errors, reset and responsive paper", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/dashboard");
-  await page.getByRole("button", { name: "Simple mode off" }).click();
+  await page.getByRole("button", { name: "Light mode off" }).click();
   await expect(page.locator("main")).toHaveAttribute("data-mode", "simple");
   await page.locator("#resume-json").fill("{}");
   await page.getByRole("button", { name: "Parse JSON", exact: true }).click();
@@ -234,4 +235,99 @@ test("export reports missing data and renders legacy storage", async ({
   await expect(
     page.getByRole("link", { name: "Download PDF" }),
   ).toHaveAttribute("download", /^Resume_Legacy_User_/);
+});
+
+test("dashboard branding, personal-project footer and complete JSON writing guide", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/dashboard");
+  const brand = page.getByRole("link", {
+    name: "Resume Forge home",
+    exact: true,
+  });
+  await expect(brand).toHaveAttribute("href", "/");
+  await expect(brand.locator("img")).toBeVisible();
+  await expect(brand).toContainText("v1.0.6");
+  const footer = page.locator(".builder-footer");
+  await expect(footer).toContainText("An independent personal project");
+  await expect(footer).toContainText("Zexiang Zhang");
+  await expect(
+    footer.getByRole("link", { name: "View source on GitHub" }),
+  ).toHaveAttribute("href", "https://github.com/626-Legendary/resume-forge");
+  await expect(footer.getByRole("link")).toHaveAttribute("target", "_blank");
+  await expect(page.getByRole("separator")).toHaveCSS(
+    "border-top-width",
+    "1px",
+  );
+  await page.getByText("JSON format and tips", { exact: true }).click();
+  const help = page.locator(".builder-help");
+  await expect(help).not.toContainText("company-name");
+  const frameworkText = await help
+    .getByLabel("Complete resume JSON framework")
+    .textContent();
+  const framework = JSON.parse(frameworkText!);
+  expect(framework).toEqual({
+    ...schema,
+    basicInfo: { name: "Your Name", contact: schema.basicInfo.contact },
+  });
+  await help.getByRole("button", { name: "Copy JSON framework" }).click();
+  await expect(help.getByRole("status")).toHaveText("JSON framework copied.");
+  const copiedFramework = await page.evaluate(() =>
+    navigator.clipboard.readText(),
+  );
+  // Clipboard text uses platform line endings on Windows.
+  expect(JSON.parse(copiedFramework)).toEqual(framework);
+  await page.locator("#resume-json").fill(copiedFramework);
+  await page.getByRole("button", { name: "Parse JSON", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
+  await page.screenshot({
+    path: "test-results/dashboard-help.png",
+    fullPage: true,
+  });
+});
+
+test("landing hero explains the workflow and preserves the visual identity on desktop and mobile", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [1280, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const hero = page.getByRole("region", {
+      name: "Tailor faster. Apply sooner.",
+    });
+    await expect(hero.getByRole("heading", { level: 1 })).toBeVisible();
+    expect(
+      await hero
+        .getByRole("heading", { level: 1 })
+        .evaluate((element) => getComputedStyle(element).fontFamily),
+    ).toMatch(/Orbitron/i);
+    await expect(
+      hero.getByRole("link", { name: "Build my resume" }),
+    ).toHaveAttribute("href", "/dashboard");
+    await expect(
+      hero.getByRole("link", { name: "View source", exact: true }),
+    ).toHaveAttribute("href", "https://github.com/626-Legendary/resume-forge");
+    await expect(
+      hero.getByText("Review pages", { exact: false }),
+    ).toBeVisible();
+    const example = JSON.parse(
+      (await hero.getByLabel("Example resume JSON").textContent())!,
+    );
+    expect(example.basicInfo.contact.email).toBe("alex@example.com");
+    await expect(
+      hero.getByRole("article", { name: "Example resume preview" }),
+    ).toContainText(example.basicInfo.name);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `test-results/home-${width}.png`,
+      fullPage: true,
+    });
+  }
 });
