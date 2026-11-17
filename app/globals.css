@@ -328,6 +328,7 @@
 }
 .resume-text p {
   margin: 8px 0;
+  white-space: pre-line;
 }
 .builder-footer {
   padding: 28px 0;

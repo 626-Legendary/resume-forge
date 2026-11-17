@@ -43,6 +43,119 @@ test("minimal resume is one Letter page with extractable text", async () => {
   }
 });
 
+test("Experience company/location and title/date occupy two rows with correct alignment", async () => {
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex" },
+    experiences: [
+      {
+        company: "Acme",
+        location: "Seattle",
+        title: "Software Engineer",
+        date: "Jan 2024 - Present",
+        description: ["Built reliable tools"],
+      },
+    ],
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const document = await readPdf(data, template);
+    try {
+      const content = await (await document.getPage(1)).getTextContent();
+      const items = content.items.filter((item) => "str" in item);
+      const get = (text: string) => {
+        const item = items.find((item) => item.str === text);
+        assert.ok(item, `Missing ${text}`);
+        return item;
+      };
+      const company = get("Acme - Seattle");
+      const role = get("Software Engineer");
+      const date = get("Jan 2024 - Present");
+      const bullet = items.find((item) =>
+        item.str.includes("Built reliable tools"),
+      )!;
+      assert.ok(Math.abs(role.transform[4] - 36) < 0.1);
+      assert.ok(Math.abs(date.transform[4] + date.width - 576) < 0.1);
+      assert.ok(Math.abs(role.transform[5] - date.transform[5]) < 0.1);
+      assert.ok(company.transform[5] > role.transform[5]);
+      assert.ok(role.transform[5] > bullet.transform[5]);
+      const text = items.map((item) => item.str).join(" ");
+      assert.ok(text.indexOf("Acme") < text.indexOf("Software Engineer"));
+      assert.ok(text.indexOf("Software Engineer") < text.indexOf("Jan 2024"));
+      assert.ok(
+        text.indexOf("Jan 2024") < text.indexOf("Built reliable tools"),
+      );
+    } finally {
+      await document.loadingTask.destroy();
+    }
+  }
+});
+
+test("Experience headers wrap, stay on one page and preserve optional fields", async () => {
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex" },
+    experiences: [
+      ...Array.from({ length: 30 }, (_, index) => ({
+        company: `Company${index}`,
+        location: "Seattle",
+        title: `Role${index} Senior Software Engineer for Cloud Infrastructure and Developer Experience`,
+        date: `Date${index} January 2020 through December 2026`,
+        description: [
+          `Result${index} Built reliable services and improved the quality of engineering tools.`,
+        ],
+      })),
+      { company: "NoLocation", title: "NoDate" },
+      { company: "NoTitle", date: "DateOnly" },
+      { description: ["NoHeaderBullet"] },
+    ],
+  });
+  const document = await readPdf(data, "engineer", {
+    name: 14,
+    section: 12,
+    body: 16,
+  });
+  try {
+    assert.ok(document.numPages > 1);
+    let text = "";
+    for (let number = 1; number <= document.numPages; number++) {
+      const content = await (await document.getPage(number)).getTextContent();
+      const items = content.items.filter((item) => "str" in item);
+      const pageText = items.map((item) => item.str).join(" ");
+      for (const item of items)
+        if (item.str.trim())
+          assert.ok(
+            item.transform[4] >= 35 && item.transform[4] + item.width <= 577,
+            `Text beyond margins: ${item.str}`,
+          );
+      for (let index = 0; index < 30; index++)
+        if (pageText.includes(`Company${index} -`)) {
+          assert.ok(
+            pageText.includes(`Role${index} `),
+            `Split role for ${index}`,
+          );
+          assert.ok(
+            pageText.includes(`Date${index} `),
+            `Split date for ${index}`,
+          );
+        }
+      text += pageText + " ";
+    }
+    for (let index = 0; index < 30; index++) {
+      assert.ok(text.includes(`Company${index} - Seattle`));
+      assert.ok(text.includes(`Result${index} `));
+    }
+    for (const field of [
+      "NoLocation",
+      "NoDate",
+      "NoTitle",
+      "DateOnly",
+      "NoHeaderBullet",
+    ])
+      assert.ok(text.includes(field));
+    assert.ok(!text.includes("NoLocation -"));
+  } finally {
+    await document.loadingTask.destroy();
+  }
+});
+
 test("skill labels use the bold PDF font while values retain body font and size", async () => {
   const data = normalizeResumeData({
     basicInfo: { name: "Alex" },

@@ -10,6 +10,7 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 
 - Rename the dashboard toggle to **Light mode on/off**, preserving existing saved preferences and the light interface's motion-free behavior.
 - Separate Font sizes and Spacing with a visible divider in both themes.
+- Experience entries use two header rows: `Company - Location` (location omitted when absent), followed by a left-aligned title and right-aligned date. Header rows stay together across page breaks; long fields wrap within their available width.
 - Rewrite **JSON format and tips** around a complete, copyable content framework: contact/profile fields, summary, all skill categories, experience, projects, education and certifications. The writing guide omits export-only metadata and avoids special instructions about it. The underlying input schema and filename behavior remain supported.
 - Add the existing logo beside the dashboard title, with a compact JSON-to-PDF caption and release version.
 - Highlight **An independent personal project — built by Zexiang Zhang** in the dashboard footer, linking directly to the [Resume Forge repository](https://github.com/626-Legendary/resume-forge). Dashboard and landing page reuse the same footer layout, navigation, divider and spacing, with theme-aware dashboard colors.

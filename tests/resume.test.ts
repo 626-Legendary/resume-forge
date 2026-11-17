@@ -189,6 +189,36 @@ test("links reject executable schemes", () => {
   assert.equal(safeResumeUrl("github.com/alex"), "https://github.com/alex");
 });
 
+test("Experience uses company/location then title/date without empty separators or headers", () => {
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex" },
+    experiences: [
+      {
+        company: "Acme",
+        location: "Seattle",
+        title: "Engineer",
+        date: "2024 - Present",
+      },
+      { company: "Remote Co", title: "Developer" },
+      { date: "2020" },
+      { description: ["Achievement only"] },
+    ],
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const lines = buildResumeLines(data, template);
+    const headers = lines.filter((line) => line.experience);
+    assert.deepEqual(
+      headers.map((line) => line.text),
+      [
+        "Acme - Seattle\nEngineer | 2024 - Present",
+        "Remote Co\nDeveloper",
+        "2020",
+      ],
+    );
+    assert.ok(lines.some((line) => line.text === "Achievement only"));
+  }
+});
+
 test("skill category labels remain separate from regular-weight values", () => {
   const data = normalizeResumeData({
     basicInfo: { name: "Alex" },

@@ -4,6 +4,7 @@
 
 - Rename the visible toggle to “Light mode on/off”. Keep the pressed state, light palette and motion suppression. Preserve the existing preference storage key so returning users retain their choice.
 - Add a full-width, theme-aware separator between Font sizes and Spacing. Keep the independent restore actions.
+- Experience layout: first row is company plus optional ` - Location`; second row has title on the left and optional date aligned to the right page margin. Omit absent fields and empty header rows. Keep the two-row header together while permitting long field values to wrap, and preserve company/title/date/bullet text extraction order in both templates.
 - Replace the abbreviated JSON help with a full content framework generated from the shared default schema, excluding export-only company metadata. Include every supported content section and nested entry field; use a non-empty placeholder name so the copied framework can be parsed immediately.
 - Explain optional sections, quoted strings, arrays, trailing commas, AI output without Markdown fences and Parse JSON. Provide a copy button with success/error status. Keep long code in a keyboard-accessible scrolling region.
 - Pair the existing logo with the Resume Forge title and JSON-to-PDF/version caption. Ensure the header fits narrow viewports in both themes and the home link has an accessible name.

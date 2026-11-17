@@ -1,4 +1,4 @@
-import type { ResumeData } from "@/types/resume";
+import type { Experience, ResumeData } from "@/types/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
 
 export type ResumeInline = { text: string; link?: string };
@@ -9,6 +9,7 @@ export type ResumeLine = {
   link?: string;
   parts?: ResumeInline[];
   label?: string;
+  experience?: Pick<Experience, "company" | "location" | "title" | "date">;
 };
 
 export function safeResumeUrl(value?: string): string | undefined {
@@ -96,8 +97,22 @@ export function buildResumeLines(
     if (!data.experiences?.length) return;
     add("Experience", "section");
     data.experiences.forEach((item) => {
-      add(join([item.company, item.title]), "heading");
-      add(join([item.location, item.date]));
+      const companyLine = [item.company, item.location]
+        .filter(Boolean)
+        .join(" - ");
+      const roleLine = join([item.title, item.date]);
+      const text = [companyLine, roleLine].filter(Boolean).join("\n");
+      if (text)
+        lines.push({
+          text,
+          kind: "heading",
+          experience: {
+            company: item.company,
+            location: item.location,
+            title: item.title,
+            date: item.date,
+          },
+        });
       bullets(item.description);
     });
   };
