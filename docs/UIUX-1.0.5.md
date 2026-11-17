@@ -25,6 +25,8 @@ This addendum supersedes the company input and fixed typography details in the 1
 
 ## Verification
 
+Contact layout: group phone/email/location in the first row and LinkedIn/GitHub/website profiles in the second row, separated by `|`. Preserve each profile's hyperlink and allow natural text wrapping within the Letter margins. Keep additional plain-text status notes on their own subsequent rows. Omit empty rows and separators for missing entries.
+
 - Check normalized field order, missing/blank company fallback and legacy migration precedence.
 - Extract text from actual PDFs to ensure the target company is absent, independently verify name/section/body point sizes, and check both templates.
 - Compare page counts at different body sizes and confirm all content survives repagination.

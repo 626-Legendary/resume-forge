@@ -211,3 +211,108 @@ test("sample resume in both templates produces real multi-page PDF text", async 
     }
   }
 });
+
+test("PDF header uses two compact contact rows and preserves individual hyperlink targets", async () => {
+  const data = normalizeResumeData({
+    basicInfo: {
+      name: "Alex",
+      contact: {
+        tel: "555-1234",
+        email: "alex@example.com",
+        location: "Seattle",
+        extra: {
+          linkedIn: {
+            content: "LinkedIn",
+            link: "https://linkedin.com/in/alex",
+          },
+          github: { content: "GitHub", link: "https://github.com/alex" },
+          website: { content: "Website", link: "https://alex.example.com" },
+        },
+      },
+    },
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const document = await readPdf(data, template);
+    try {
+      const page = await document.getPage(1);
+      const content = await page.getTextContent();
+      const items = content.items
+        .filter((item) => "str" in item)
+        .filter((item) => item.str.trim());
+      const contact = items.find((item) => item.str.includes("555-1234"));
+      assert.ok(contact);
+      const profileItems = ["LinkedIn", "GitHub", "Website"].map((text) => {
+        const item = items.find((item) => item.str.includes(text));
+        assert.ok(item, `Missing ${text}`);
+        return item;
+      });
+      assert.ok(
+        profileItems.every(
+          (item) => item.transform[5] === profileItems[0].transform[5],
+        ),
+      );
+      assert.ok(contact.transform[5] > profileItems[0].transform[5]);
+      assert.equal(new Set(items.map((item) => item.transform[5])).size, 3);
+      const annotations = await page.getAnnotations();
+      for (const url of [
+        "https://linkedin.com/in/alex",
+        "https://github.com/alex",
+        "https://alex.example.com/",
+      ]) {
+        assert.ok(
+          annotations.some((annotation) => annotation.url === url),
+          `Missing PDF link ${url}`,
+        );
+      }
+    } finally {
+      await document.loadingTask.destroy();
+    }
+  }
+});
+
+test("long profile rows wrap within Letter margins and retain all links", async () => {
+  const extra = Object.fromEntries(
+    Array.from({ length: 8 }, (_, index) => [
+      `profile${index}`,
+      {
+        content: `Professional profile number ${index}`,
+        link: `https://example.com/profile/${index}`,
+      },
+    ]),
+  );
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex", contact: { extra } },
+  });
+  const document = await readPdf(data, "engineer", {
+    name: 14,
+    section: 12,
+    body: 16,
+  });
+  try {
+    const page = await document.getPage(1);
+    const content = await page.getTextContent();
+    const items = content.items
+      .filter((item) => "str" in item)
+      .filter((item) => item.str.trim() && item.str !== "Alex");
+    assert.ok(new Set(items.map((item) => item.transform[5])).size > 1);
+    for (const item of items) {
+      assert.ok(
+        item.transform[4] >= 35 && item.transform[4] + item.width <= 577,
+        `Header text outside margin: ${item.str}`,
+      );
+    }
+    const text = items.map((item) => item.str).join(" ");
+    for (let index = 0; index < 8; index++)
+      assert.ok(text.includes(`Professional profile number ${index}`));
+    const annotations = await page.getAnnotations();
+    for (let index = 0; index < 8; index++)
+      assert.ok(
+        annotations.some(
+          (annotation) =>
+            annotation.url === `https://example.com/profile/${index}`,
+        ),
+      );
+  } finally {
+    await document.loadingTask.destroy();
+  }
+});

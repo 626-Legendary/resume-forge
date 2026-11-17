@@ -1,10 +1,13 @@
 import type { ResumeData } from "@/types/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
 
+export type ResumeInline = { text: string; link?: string };
+
 export type ResumeLine = {
   text: string;
   kind: "name" | "contact" | "section" | "heading" | "body" | "bullet";
   link?: string;
+  parts?: ResumeInline[];
 };
 
 export function safeResumeUrl(value?: string): string | undefined {
@@ -42,13 +45,37 @@ export function buildResumeLines(
     items.filter(Boolean).join(" | ");
   const bullets = (items?: string[]) =>
     items?.forEach((text) => add(text, "bullet"));
+  const addContactRow = (parts: ResumeInline[]) => {
+    if (parts.length)
+      lines.push({
+        text: parts.map((part) => part.text).join(" | "),
+        kind: "contact",
+        parts,
+      });
+  };
   add(data.basicInfo.name, "name");
   const contact = data.basicInfo.contact;
   add(join([contact?.tel, contact?.email, contact?.location]), "contact");
-  Object.values(contact?.extra ?? {}).forEach((item) => {
-    if (typeof item === "string") add(item, "contact");
-    else add(item.content, "contact", item.link);
+  const profileParts: ResumeInline[] = [];
+  const otherContactLines: ResumeInline[] = [];
+  Object.entries(contact?.extra ?? {}).forEach(([key, item]) => {
+    const text = (typeof item === "string" ? item : item.content).trim();
+    if (!text) return;
+    const link = safeResumeUrl(
+      typeof item === "string" ? undefined : item.link,
+    );
+    const part = { text, ...(link ? { link } : {}) };
+    if (
+      link ||
+      ["linkedin", "github", "portfolio", "website"].includes(key.toLowerCase())
+    ) {
+      profileParts.push(part);
+    } else {
+      otherContactLines.push(part);
+    }
   });
+  addContactRow(profileParts);
+  otherContactLines.forEach((part) => add(part.text, "contact"));
   if (data.summary) {
     add("Summary", "section");
     add(data.summary);

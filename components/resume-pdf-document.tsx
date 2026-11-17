@@ -88,7 +88,20 @@ export default function ResumePdfDocument({
                   : 0
             }
           >
-            {line.link ? (
+            {line.parts ? (
+              line.parts.map((part, partIndex) => (
+                <Text key={partIndex}>
+                  {partIndex > 0 ? " | " : ""}
+                  {part.link ? (
+                    <Link src={part.link} style={styles.link}>
+                      {printableText(part.text)}
+                    </Link>
+                  ) : (
+                    printableText(part.text)
+                  )}
+                </Text>
+              ))
+            ) : line.link ? (
               <Link src={line.link} style={styles.link}>
                 {printableText(line.text)}
               </Link>

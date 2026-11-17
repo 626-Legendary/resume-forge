@@ -11,6 +11,7 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 - Add optional `basicInfo["company-name"]` immediately after `name` in the JSON schema. It supplies the PDF filename prefix and is excluded from the resume body and text preview. The manual Company name input has been removed.
 - Add independent **Name**, **Section titles** and **Body text** font-size controls, defaulting to **14pt**, **12pt** and **10pt**. Choose 6–32pt in 0.5pt increments. Body size includes contact information, entry headings, links and bullets.
 - Font changes automatically regenerate the same PDF used for preview and download, including page breaks and page count. Export waits for the current settings; **Reset** restores the default sizes.
+- Compact contact layout: phone, email and location share the first row; LinkedIn, GitHub and website links share the next row, separated by `|` with independent clickable targets. Rows wrap automatically when needed. Additional plain-text status notes remain below the links.
 - Preserve old JSON without a company field and migrate company metadata from 1.0.4 compatibility exports.
 
 ## Core features

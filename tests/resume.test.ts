@@ -184,3 +184,57 @@ test("links reject executable schemes", () => {
   assert.equal(safeResumeUrl("data:text/html,test"), undefined);
   assert.equal(safeResumeUrl("github.com/alex"), "https://github.com/alex");
 });
+
+test("contact profiles share one row with independent safe links and no empty separators", () => {
+  const data = normalizeResumeData({
+    basicInfo: {
+      name: "Alex",
+      contact: {
+        tel: "555-1234",
+        email: "alex@example.com",
+        location: "Seattle",
+        extra: {
+          linkedIn: { content: "LinkedIn", link: "linkedin.com/in/alex" },
+          github: { content: "GitHub", link: "https://github.com/alex" },
+          website: { content: "Website", link: "javascript:alert(1)" },
+          portfolio: "Portfolio",
+          empty: { content: "" },
+          status: "Open to relocation",
+        },
+      },
+    },
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const contacts = buildResumeLines(data, template).filter(
+      (line) => line.kind === "contact",
+    );
+    assert.deepEqual(
+      contacts.map((line) => line.text),
+      [
+        "555-1234 | alex@example.com | Seattle",
+        "LinkedIn | GitHub | Website | Portfolio",
+        "Open to relocation",
+      ],
+    );
+    assert.deepEqual(contacts[1].parts, [
+      { text: "LinkedIn", link: "https://linkedin.com/in/alex" },
+      { text: "GitHub", link: "https://github.com/alex" },
+      { text: "Website" },
+      { text: "Portfolio" },
+    ]);
+  }
+  assert.deepEqual(
+    buildResumeLines(
+      normalizeResumeData({ basicInfo: { name: "Alex" } }),
+      "engineer",
+    ).map((line) => line.kind),
+    ["name"],
+  );
+  const single = buildResumeLines(
+    normalizeResumeData({
+      basicInfo: { name: "Alex", contact: { extra: { github: "GitHub" } } },
+    }),
+    "engineer",
+  );
+  assert.equal(single[1].text, "GitHub");
+});
