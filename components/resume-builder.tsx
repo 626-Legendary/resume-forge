@@ -1,10 +1,9 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { FaGithub } from "react-icons/fa";
+import AppFooter from "@/components/AppFooter";
 import logo from "@/public/logo.png";
 import ResumeJsonHelp from "@/components/resume-json-help";
-import { creatorName, githubRepositoryUrl } from "@/lib/site";
 import { useState, useSyncExternalStore } from "react";
 import { useBuilder } from "@/components/use-builder";
 import { useResumePdf } from "@/components/use-resume-pdf";
@@ -14,7 +13,6 @@ import {
   RESUME_TEMPLATE_OPTIONS,
   type ResumeTemplateId,
 } from "@/lib/resume-template";
-import { app_version } from "@/constants/metaData";
 import {
   RESUME_FONT_FIELDS,
   RESUME_FONT_SIZE_OPTIONS,
@@ -89,9 +87,6 @@ export default function ResumeBuilder() {
           </span>
           <span className="builder-brand-copy">
             <span className="builder-brand-title">Resume Forge</span>
-            <span className="builder-brand-meta">
-              JSON to PDF <span aria-hidden="true">·</span> v{app_version}
-            </span>
           </span>
         </Link>
         <button type="button" aria-pressed={light} onClick={toggleMode}>
@@ -307,29 +302,7 @@ export default function ResumeBuilder() {
           </div>
         </section>
       </div>
-      <footer className="builder-footer">
-        <div className="builder-footer-author">
-          <p className="eyebrow">An independent personal project</p>
-          <p>
-            Built by <strong>{creatorName}</strong>.
-          </p>
-          <p className="muted">
-            Created to make resume iteration easier. Your PDF is generated in
-            this browser.
-          </p>
-        </div>
-        <div className="builder-footer-links">
-          <a
-            href={githubRepositoryUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FaGithub aria-hidden="true" />
-            View source on GitHub
-          </a>
-          <span>Resume Forge · v{app_version}</span>
-        </div>
-      </footer>
+      <AppFooter variant="builder" />
     </main>
   );
 }

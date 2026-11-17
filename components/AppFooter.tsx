@@ -26,9 +26,20 @@ const footerLinks = [
   },
 ];
 
-const AppFooter = () => {
+const AppFooter = ({
+  variant = "default",
+}: {
+  variant?: "default" | "builder";
+}) => {
+  const isBuilder = variant === "builder";
   return (
-    <footer className="relative overflow-hidden border-t border-orange-500/25 bg-[#07090c] px-4 py-7 text-zinc-500 sm:px-5 md:px-8">
+    <footer
+      className={
+        isBuilder
+          ? "builder-footer relative overflow-hidden"
+          : "relative overflow-hidden border-t border-orange-500/25 bg-[#07090c] px-4 py-7 text-zinc-500 sm:px-5 md:px-8"
+      }
+    >
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.16]"
@@ -60,14 +71,14 @@ const AppFooter = () => {
               </Link>
 
               <div className="min-w-0">
-                <p className="font-[var(--font-orbitron)] text-sm font-black uppercase tracking-[0.24em] text-orange-400 sm:tracking-[0.28em]">
+                <p className="app-footer-title font-[var(--font-orbitron)] text-sm font-black uppercase tracking-[0.24em] text-orange-400 sm:tracking-[0.28em]">
                   Resume Forge{" "}
                   <span className="text-xs tracking-[0.1em]">
                     v{app_version}
                   </span>
                 </p>
 
-                <p className="mt-1 hidden font-[var(--font-mono)] text-[11px] uppercase tracking-[0.16em] text-zinc-600 sm:block">
+                <p className="app-footer-tagline mt-1 hidden font-[var(--font-mono)] text-[11px] uppercase tracking-[0.16em] text-zinc-600 sm:block">
                   JSON to print-ready resume
                 </p>
               </div>
@@ -87,9 +98,12 @@ const AppFooter = () => {
                   href={item.href}
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noopener noreferrer" : undefined}
-                  className="group inline-flex items-center gap-2 border border-zinc-800 bg-[#07090c]/60 px-3 py-2 font-[var(--font-orbitron)] text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-400 transition hover:border-orange-500/60 hover:text-orange-400 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-xs sm:tracking-[0.16em]"
+                  className="app-footer-link group inline-flex items-center gap-2 border border-zinc-800 bg-[#07090c]/60 px-3 py-2 font-[var(--font-orbitron)] text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-400 transition hover:border-orange-500/60 hover:text-orange-400 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-xs sm:tracking-[0.16em]"
                 >
-                  <Icon className="text-sm text-zinc-500 transition group-hover:text-orange-400" />
+                  <Icon
+                    aria-hidden="true"
+                    className="app-footer-icon text-sm text-zinc-500 transition group-hover:text-orange-400"
+                  />
                   {item.label}
                 </Link>
               );
@@ -97,20 +111,22 @@ const AppFooter = () => {
           </nav>
         </div>
         <div className="my-5 h-px w-full bg-gradient-to-r from-transparent via-orange-500/45 to-transparent" />
-        <div className="flex flex-col gap-4 border-zinc-800 font-[var(--font-mono)] text-xs leading-5 text-zinc-600 md:flex-row md:items-end md:justify-between">
+        <div className="app-footer-meta flex flex-col gap-4 border-zinc-800 font-[var(--font-mono)] text-xs leading-5 text-zinc-600 md:flex-row md:items-end md:justify-between">
           <div>
             <p>
               Copyright {new Date().getFullYear()} Resume Forge. All rights
               reserved.
             </p>
 
-            <p className="mt-1 text-zinc-500">
-              Independent project built by{" "}
+            <p className="app-footer-attribution mt-1 text-zinc-500">
+              {isBuilder
+                ? "An independent personal project built by "
+                : "Independent project built by "}
               <Link
                 href="https://www.linkedin.com/in/zexiangzhang/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-orange-400 transition hover:text-orange-300"
+                className="app-footer-author text-orange-400 transition hover:text-orange-300"
               >
                 Zexiang Zhang
               </Link>
@@ -118,9 +134,10 @@ const AppFooter = () => {
             </p>
           </div>
 
-          <p className="max-w-md text-zinc-500 md:text-right">
-            Built to help job seekers move faster, apply smarter, and land
-            sooner.
+          <p className="app-footer-note max-w-md text-zinc-500 md:text-right">
+            {isBuilder
+              ? "Your resume is generated in this browser."
+              : "Built to help job seekers move faster, apply smarter, and land sooner."}
           </p>
         </div>
       </div>

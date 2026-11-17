@@ -330,40 +330,39 @@
   margin: 8px 0;
 }
 .builder-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 24px 0;
+  padding: 28px 0;
   margin-top: 24px;
   font-size: 12px;
   color: var(--muted);
-  border-top: 1px solid var(--border);
-  align-items: center;
+  border-top: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  background: var(--background);
 }
-.builder-footer-author > p {
-  margin: 6px 0;
+.builder-footer .app-footer-title,
+.builder-footer .app-footer-author {
+  color: var(--accent);
 }
-.builder-footer-author > p:nth-child(2) {
-  font-size: 17px;
+.builder-footer .app-footer-tagline,
+.builder-footer .app-footer-link,
+.builder-footer .app-footer-icon,
+.builder-footer .app-footer-meta,
+.builder-footer .app-footer-attribution,
+.builder-footer .app-footer-note {
+  color: var(--muted);
+}
+.builder-footer .app-footer-attribution {
   color: var(--text);
 }
-.builder-footer-author strong {
+.builder-footer .app-footer-author {
   font-weight: 650;
 }
-.builder-footer-links {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-end;
+.builder-footer .app-footer-link {
+  border-color: var(--border);
+  background: transparent;
 }
-.builder-footer-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
+.builder-footer .app-footer-link:hover,
+.builder-footer .app-footer-link:hover .app-footer-icon {
   color: var(--accent);
-  font-size: 14px;
+  border-color: var(--accent);
 }
 @media (max-width: 960px) {
   .builder-grid {
@@ -393,9 +392,6 @@
   }
   .builder-brand-meta {
     font-size: 10px;
-  }
-  .builder-footer-links {
-    align-items: flex-start;
   }
   .editor-panel {
     padding: 16px;

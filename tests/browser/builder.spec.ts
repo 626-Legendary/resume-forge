@@ -249,14 +249,16 @@ test("dashboard branding, personal-project footer and complete JSON writing guid
   });
   await expect(brand).toHaveAttribute("href", "/");
   await expect(brand.locator("img")).toBeVisible();
-  await expect(brand).toContainText("v1.0.6");
   const footer = page.locator(".builder-footer");
+  await expect(footer).toContainText("v1.0.6");
   await expect(footer).toContainText("An independent personal project");
   await expect(footer).toContainText("Zexiang Zhang");
   await expect(
-    footer.getByRole("link", { name: "View source on GitHub" }),
+    footer.getByRole("link", { name: "GitHub", exact: true }),
   ).toHaveAttribute("href", "https://github.com/626-Legendary/resume-forge");
-  await expect(footer.getByRole("link")).toHaveAttribute("target", "_blank");
+  await expect(
+    footer.getByRole("link", { name: "GitHub", exact: true }),
+  ).toHaveAttribute("target", "_blank");
   await expect(page.getByRole("separator")).toHaveCSS(
     "border-top-width",
     "1px",

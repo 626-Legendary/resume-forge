@@ -8,6 +8,7 @@
 - Explain optional sections, quoted strings, arrays, trailing commas, AI output without Markdown fences and Parse JSON. Provide a copy button with success/error status. Keep long code in a keyboard-accessible scrolling region.
 - Pair the existing logo with the Resume Forge title and JSON-to-PDF/version caption. Ensure the header fits narrow viewports in both themes and the home link has an accessible name.
 - Make personal authorship prominent: “An independent personal project”, “Built by Zexiang Zhang” and a direct repository link to `https://github.com/626-Legendary/resume-forge`. Keep the local PDF-generation note secondary.
+- Reuse the landing footer component: 28px vertical padding, a brand/navigation row, a gradient divider with 20px vertical margins, and a lower copyright/author/note row. Keep its responsive stacking and adapt text/borders to dashboard light and dark themes. Keep the version in the footer; the dashboard header uses the logo and title alone.
 
 ## Landing hero
 
