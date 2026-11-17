@@ -303,36 +303,36 @@ export default function Home() {
                     <article
                       aria-label="Example resume preview"
                       className="flex min-h-[360px] flex-col bg-white p-5 text-[11px] leading-[1.5] text-black shadow-[0_20px_60px_rgba(0,0,0,0.25)] sm:min-h-[430px]"
-                      style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
                     >
-                      <div className="mb-5 text-center">
-                        <h2 className="text-base font-bold">Alex Morgan</h2>
-                        <p className="mt-1 text-[10px]">alex@example.com</p>
+                      <p className="sr-only">
+                        Resume layout illustration with a name, contact details
+                        and three content sections.
+                      </p>
+                      <div aria-hidden="true" className="space-y-6">
+                        <div className="mb-7 space-y-2">
+                          <div className="mx-auto h-4 w-28 max-w-full rounded-sm bg-zinc-800" />
+                          <div className="mx-auto h-1.5 w-36 max-w-full rounded-sm bg-zinc-300" />
+                          <div className="mx-auto h-1.5 w-24 max-w-full rounded-sm bg-zinc-300" />
+                        </div>
+                        {[0, 1, 2].map((index) => (
+                          <div key={index}>
+                            <div className="mb-3 border-b border-zinc-300 pb-2">
+                              <div className="h-2 w-16 rounded-sm bg-zinc-700" />
+                            </div>
+                            {index === 2 && (
+                              <div className="mb-2 flex justify-between gap-3">
+                                <div className="h-1.5 w-24 rounded-sm bg-zinc-400" />
+                                <div className="h-1.5 w-12 rounded-sm bg-zinc-300" />
+                              </div>
+                            )}
+                            <div className="space-y-2">
+                              <div className="h-1.5 w-full rounded-sm bg-zinc-300" />
+                              <div className="h-1.5 w-[90%] rounded-sm bg-zinc-300" />
+                              <div className="h-1.5 w-[70%] rounded-sm bg-zinc-300" />
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <section>
-                        <h3 className="mb-2 border-b border-black pb-1 font-bold">
-                          Summary
-                        </h3>
-                        <p>Software engineer building useful products.</p>
-                      </section>
-                      <section className="mt-4">
-                        <h3 className="mb-2 border-b border-black pb-1 font-bold">
-                          Skills
-                        </h3>
-                        <p>
-                          <strong>Languages:</strong> TypeScript, Python
-                        </p>
-                      </section>
-                      <section className="mt-4">
-                        <h3 className="mb-2 border-b border-black pb-1 font-bold">
-                          Experience
-                        </h3>
-                        <p className="font-bold">Acme</p>
-                        <p>Software Engineer</p>
-                        <p className="mt-2">
-                          • Built reliable tools for growing teams.
-                        </p>
-                      </section>
                       <p className="mt-auto pt-6 text-[9px] tracking-wide text-zinc-500">
                         US LETTER · PAGE 1
                       </p>

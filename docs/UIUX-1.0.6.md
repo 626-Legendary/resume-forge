@@ -16,7 +16,7 @@
 - Preserve the existing dark orange identity, grid/lighting effects, Orbitron headings and JetBrains Mono body/code font.
 - Lead with “Tailor faster. Apply sooner.” Explain JSON input, actual Letter page review and direct PDF download.
 - Give the builder a clear primary action and link the secondary action to the repository. Include the three-step workflow and browser-local/no-account context.
-- Replace anonymous placeholder bars with readable sample resume content. Show valid JSON using the actual nested contact schema, matching the sample resume's name and content. Treat this panel as an illustration, not a second editor.
+- Show valid JSON using the actual nested contact schema beside a white-paper resume skeleton: name/contact bars, section headings and body lines. Keep the skeleton static, with a concise accessible description; it illustrates a layout rather than indicating a loading state or presenting a second editor.
 - Verify desktop and mobile layouts, primary navigation, readable text and absence of horizontal overflow.
 
 ## Verification

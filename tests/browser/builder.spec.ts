@@ -319,9 +319,13 @@ test("landing hero explains the workflow and preserves the visual identity on de
       (await hero.getByLabel("Example resume JSON").textContent())!,
     );
     expect(example.basicInfo.contact.email).toBe("alex@example.com");
-    await expect(
-      hero.getByRole("article", { name: "Example resume preview" }),
-    ).toContainText(example.basicInfo.name);
+    const preview = hero.getByRole("article", {
+      name: "Example resume preview",
+    });
+    await expect(preview).toBeVisible();
+    await expect(preview).not.toContainText(example.basicInfo.name);
+    await expect(preview.locator('[aria-hidden="true"]')).toBeVisible();
+    await expect(preview).toContainText("US LETTER · PAGE 1");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,
