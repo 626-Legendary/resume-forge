@@ -14,6 +14,7 @@ import {
   RESUME_FONT_FIELDS,
   RESUME_FONT_SIZE_OPTIONS,
 } from "@/lib/resume-typography";
+import { RESUME_SPACING_FIELDS } from "@/lib/resume-spacing";
 const MODE_KEY = "resume-forge-simple-mode";
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -45,6 +46,7 @@ export default function ResumeBuilder() {
     builder.templateId,
     revision,
     builder.fontSizes,
+    builder.spacing,
   );
   const [downloadError, setDownloadError] = useState("");
   function toggleMode() {
@@ -153,6 +155,13 @@ export default function ResumeBuilder() {
             </div>
             <fieldset className="font-size-controls">
               <legend>Font sizes</legend>
+              <button
+                type="button"
+                className="settings-reset"
+                onClick={builder.resetFontSizes}
+              >
+                Restore font defaults
+              </button>
               <div className="font-size-grid">
                 {RESUME_FONT_FIELDS.map(({ key, label }) => (
                   <div key={key}>
@@ -181,6 +190,43 @@ export default function ResumeBuilder() {
                 automatically.
               </p>
             </fieldset>
+            <fieldset className="font-size-controls">
+              <legend>Spacing</legend>
+              <button
+                type="button"
+                className="settings-reset"
+                onClick={builder.resetSpacing}
+              >
+                Restore spacing defaults
+              </button>
+              <div className="font-size-grid">
+                {RESUME_SPACING_FIELDS.map(({ key, label, values }) => (
+                  <div key={key}>
+                    <label htmlFor={`spacing-${key}`}>{label}</label>
+                    <select
+                      id={`spacing-${key}`}
+                      value={builder.spacing[key]}
+                      onChange={(event) =>
+                        builder.setSpacing((current) => ({
+                          ...current,
+                          [key]: Number(event.target.value),
+                        }))
+                      }
+                    >
+                      {values.map((value) => (
+                        <option key={value} value={value}>
+                          {value}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <p className="muted">
+                Spacing updates the preview, page count and exported PDF
+                automatically.
+              </p>
+            </fieldset>
           </div>
           <details className="builder-help">
             <summary>JSON format and tips</summary>
@@ -190,8 +236,8 @@ export default function ResumeBuilder() {
               omitted.
             </p>
             <p>
-              Set <code>{'basicInfo["company-name"]'}</code> for the PDF filename. It is not
-              printed on your resume.
+              Set <code>{'basicInfo["company-name"]'}</code> for the PDF
+              filename. It is not printed on your resume.
             </p>
             <p>
               Generate content using the schema below, then paste it into JSON

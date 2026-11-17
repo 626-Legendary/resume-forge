@@ -25,6 +25,15 @@ This addendum supersedes the company input and fixed typography details in the 1
 
 ## Verification
 
+### Skills hierarchy, spacing and independent reset
+
+- Render Skills category labels, including the colon, in the bold font while values remain regular body text. Apply the same hierarchy in the readable text preview.
+- Add line-height (1–2 in 0.05 steps, default 1.35), paragraph gap (0–12pt, default 3pt) and section gap (0–24pt, default 10pt) controls. Changes regenerate the shared PDF artifact and page count, preserving Letter dimensions and margins.
+- Provide independent font and spacing restore buttons. Font restore resets 14/12/10pt only. Spacing restore resets 1.35/3/10 only. Neither clears JSON, parsed data or the selected template. The main Reset restores both groups and clears content as before.
+- Normalize stored spacing values independently for compatibility exports; old payloads receive the current default spacing.
+- Keep downloaded hyperlinks as standard URI actions. New-tab/window behavior is controlled by the PDF reader; do not promise that a PDF can enforce HTML-style link targets across readers. See Adobe's [URI action definition](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.5_v6.pdf#page=624).
+- Verify actual PDF bold/regular font identity, measured baseline gaps, export compatibility and independent reset behavior in browser regression tests.
+
 Contact layout: group phone/email/location in the first row and LinkedIn/GitHub/website profiles in the second row, separated by `|`. Preserve each profile's hyperlink and allow natural text wrapping within the Letter margins. Keep additional plain-text status notes on their own subsequent rows. Omit empty rows and separators for missing entries.
 
 - Check normalized field order, missing/blank company fallback and legacy migration precedence.

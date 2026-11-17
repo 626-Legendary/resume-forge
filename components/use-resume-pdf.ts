@@ -7,12 +7,17 @@ import {
   DEFAULT_RESUME_FONT_SIZES,
   type ResumeFontSizes,
 } from "@/lib/resume-typography";
+import {
+  DEFAULT_RESUME_SPACING,
+  type ResumeSpacing,
+} from "@/lib/resume-spacing";
 
 type PdfRequest = {
   data: ResumeData | null;
   templateId: ResumeTemplateId;
   revision: number;
   fontSizes: ResumeFontSizes;
+  spacing: ResumeSpacing;
 };
 type PdfArtifact = {
   request: PdfRequest;
@@ -29,6 +34,7 @@ export function useResumePdf(
   templateId: ResumeTemplateId,
   revision = 0,
   fontSizes: ResumeFontSizes = DEFAULT_RESUME_FONT_SIZES,
+  spacing: ResumeSpacing = DEFAULT_RESUME_SPACING,
 ) {
   const [artifact, setArtifact] = useState<PdfArtifact | null>(null);
   const [failure, setFailure] = useState<{
@@ -36,11 +42,11 @@ export function useResumePdf(
     message: string;
   } | null>(null);
   const request = useMemo(
-    () => ({ data, templateId, revision, fontSizes }),
-    [data, templateId, revision, fontSizes],
+    () => ({ data, templateId, revision, fontSizes, spacing }),
+    [data, templateId, revision, fontSizes, spacing],
   );
   useEffect(() => {
-    const { data, templateId, fontSizes } = request;
+    const { data, templateId, fontSizes, spacing } = request;
     if (!data) return;
     let cancelled = false;
     let url: string | undefined;
@@ -53,7 +59,7 @@ export function useResumePdf(
           import("@/components/resume-pdf-document"),
         ]);
         const blob = await pdf(
-          ResumePdfDocument({ data, templateId, fontSizes }),
+          ResumePdfDocument({ data, templateId, fontSizes, spacing }),
         ).toBlob();
         if (cancelled) return;
         url = URL.createObjectURL(blob);

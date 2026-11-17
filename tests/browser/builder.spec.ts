@@ -93,14 +93,12 @@ test("font controls update actual downloaded PDF and reset to 14/12/10", async (
   await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
   await expect(page.getByLabel("Section titles (pt)")).toHaveValue("12");
   await expect(page.getByLabel("Body text (pt)")).toHaveValue("10");
-  await page
-    .locator("#resume-json")
-    .fill(
-      JSON.stringify({
-        basicInfo: { name: "Typography User", "company-name": "HiddenTarget" },
-        summary: "Typography body",
-      }),
-    );
+  await page.locator("#resume-json").fill(
+    JSON.stringify({
+      basicInfo: { name: "Typography User", "company-name": "HiddenTarget" },
+      summary: "Typography body",
+    }),
+  );
   await page.getByRole("button", { name: "Parse JSON", exact: true }).click();
   await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
   await page.getByLabel("Name (pt)", { exact: true }).selectOption("22");
@@ -168,6 +166,53 @@ test("validation errors, reset and responsive paper", async ({ page }) => {
   });
   await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect(page.locator("canvas")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeDisabled();
+});
+
+test("font and spacing defaults restore independently without clearing JSON or the template", async ({
+  page,
+}) => {
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "Load example" }).click();
+  const input = await page.locator("#resume-json").inputValue();
+  await page
+    .getByLabel("Template", { exact: true })
+    .selectOption("engineer-intern");
+  await page.getByLabel("Name (pt)", { exact: true }).selectOption("20");
+  await page.getByLabel("Section titles (pt)").selectOption("16");
+  await page.getByLabel("Body text (pt)").selectOption("12");
+  await page.getByLabel("Line spacing", { exact: true }).selectOption("1.8");
+  await page.getByLabel("Paragraph gap (pt)").selectOption("6");
+  await page.getByLabel("Section gap (pt)").selectOption("18");
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
+  await page.getByRole("button", { name: "Restore font defaults" }).click();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Section titles (pt)")).toHaveValue("12");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("10");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.8",
+  );
+  await expect(page.getByLabel("Paragraph gap (pt)")).toHaveValue("6");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("18");
+  await expect(page.locator("#resume-json")).toHaveValue(input);
+  await expect(page.getByLabel("Template", { exact: true })).toHaveValue(
+    "engineer-intern",
+  );
+  await page.getByLabel("Name (pt)", { exact: true }).selectOption("18");
+  await page.getByRole("button", { name: "Restore spacing defaults" }).click();
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.35",
+  );
+  await expect(page.getByLabel("Paragraph gap (pt)")).toHaveValue("3");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("10");
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("18");
+  await expect(page.locator("#resume-json")).toHaveValue(input);
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.35",
+  );
   await expect(page.getByRole("button", { name: "Export PDF" })).toBeDisabled();
 });
 

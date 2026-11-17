@@ -15,6 +15,7 @@ export default function ResumeExportView() {
     state.status === "ready" ? state.templateId : DEFAULT_RESUME_TEMPLATE_ID,
     revision,
     state.status === "ready" ? state.fontSizes : undefined,
+    state.status === "ready" ? state.spacing : undefined,
   );
   return (
     <main className="builder" data-mode="dark">

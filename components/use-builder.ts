@@ -15,6 +15,10 @@ import {
   DEFAULT_RESUME_FONT_SIZES,
   type ResumeFontSizes,
 } from "@/lib/resume-typography";
+import {
+  DEFAULT_RESUME_SPACING,
+  type ResumeSpacing,
+} from "@/lib/resume-spacing";
 const initialInput = stringifyResumeJson(defaultResumeJson);
 export function useBuilder() {
   const [input, setInput] = useState(initialInput);
@@ -29,6 +33,13 @@ export function useBuilder() {
   const [fontSizes, setFontSizes] = useState<ResumeFontSizes>(
     DEFAULT_RESUME_FONT_SIZES,
   );
+  const [spacing, setSpacing] = useState<ResumeSpacing>(DEFAULT_RESUME_SPACING);
+  function resetFontSizes() {
+    setFontSizes(DEFAULT_RESUME_FONT_SIZES);
+  }
+  function resetSpacing() {
+    setSpacing(DEFAULT_RESUME_SPACING);
+  }
   function parse(value = input) {
     try {
       setParsed({ input: value, data: parseResumeJson(value) });
@@ -44,7 +55,8 @@ export function useBuilder() {
     parse(value);
   }
   function reset() {
-    setFontSizes(DEFAULT_RESUME_FONT_SIZES);
+    resetFontSizes();
+    resetSpacing();
     setInput(initialInput);
     setParsed(null);
     setError("");
@@ -62,5 +74,9 @@ export function useBuilder() {
     setTemplateId,
     fontSizes,
     setFontSizes,
+    resetFontSizes,
+    spacing,
+    setSpacing,
+    resetSpacing,
   };
 }

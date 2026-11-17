@@ -199,6 +199,10 @@
   grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
   gap: 12px;
 }
+.builder button.settings-reset {
+  margin-bottom: 12px;
+  font-size: 12px;
+}
 .font-size-controls > p {
   margin-top: 8px;
   font-size: 12px;

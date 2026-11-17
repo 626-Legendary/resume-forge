@@ -1,6 +1,11 @@
 import defaultResumeJsonSource from "@/constants/default.json";
 import mockResumeJsonSource from "@/constants/mockData.json";
 import {
+  DEFAULT_RESUME_SPACING,
+  normalizeResumeSpacing,
+  type ResumeSpacing,
+} from "@/lib/resume-spacing";
+import {
   DEFAULT_RESUME_FONT_SIZES,
   normalizeResumeFontSizes,
   type ResumeFontSizes,
@@ -29,6 +34,7 @@ export type StoredResumeExport = {
   resumeData: ResumeData;
   templateId: ResumeTemplateId;
   fontSizes: ResumeFontSizes;
+  spacing: ResumeSpacing;
 };
 
 export function stringifyResumeJson(input: unknown): string {
@@ -74,11 +80,13 @@ export function createStoredResumeExport(
   resumeData: ResumeData,
   templateId: ResumeTemplateId,
   fontSizes: ResumeFontSizes = DEFAULT_RESUME_FONT_SIZES,
+  spacing: ResumeSpacing = DEFAULT_RESUME_SPACING,
 ): StoredResumeExport {
   return {
     resumeData,
     templateId,
     fontSizes: normalizeResumeFontSizes(fontSizes),
+    spacing: normalizeResumeSpacing(spacing),
   };
 }
 
@@ -97,6 +105,7 @@ export function parseStoredResumeExport(
     return {
       resumeData,
       fontSizes: normalizeResumeFontSizes(source.fontSizes),
+      spacing: normalizeResumeSpacing(source.spacing),
       templateId: isResumeTemplateId(source.templateId)
         ? source.templateId
         : DEFAULT_RESUME_TEMPLATE_ID,
@@ -106,6 +115,7 @@ export function parseStoredResumeExport(
   return {
     resumeData: normalizeResumeData(parsed),
     fontSizes: normalizeResumeFontSizes(undefined),
+    spacing: normalizeResumeSpacing(undefined),
     templateId: DEFAULT_RESUME_TEMPLATE_ID,
   };
 }

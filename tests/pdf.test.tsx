@@ -5,14 +5,16 @@ import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 import ResumePdfDocument from "../components/resume-pdf-document";
 import { normalizeResumeData, mockResumeJson } from "../lib/resume";
 import type { ResumeFontSizes } from "../lib/resume-typography";
+import type { ResumeSpacing } from "../lib/resume-spacing";
 
 async function readPdf(
   data: Parameters<typeof ResumePdfDocument>[0]["data"],
   templateId: "engineer" | "engineer-intern" = "engineer",
   fontSizes?: ResumeFontSizes,
+  spacing?: ResumeSpacing,
 ) {
   const bytes = await renderToBuffer(
-    ResumePdfDocument({ data, templateId, fontSizes }),
+    ResumePdfDocument({ data, templateId, fontSizes, spacing }),
   );
   return getDocument({ data: new Uint8Array(bytes), useSystemFonts: true })
     .promise;
@@ -39,6 +41,75 @@ test("minimal resume is one Letter page with extractable text", async () => {
   } finally {
     await document.loadingTask.destroy();
   }
+});
+
+test("skill labels use the bold PDF font while values retain body font and size", async () => {
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex" },
+    summary: "Body sample",
+    skills: { Languages: ["TypeScript", "Python"], Frontend: ["React"] },
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const document = await readPdf(data, template);
+    try {
+      const content = await (await document.getPage(1)).getTextContent();
+      const items = content.items.filter((item) => "str" in item);
+      const bold = items.find((item) => item.str === "Alex")!;
+      const regular = items.find((item) => item.str === "Body sample")!;
+      for (const label of ["Languages:", "Frontend:"]) {
+        const item = items.find((item) => item.str.trim() === label);
+        assert.ok(item);
+        assert.equal(item.fontName, bold.fontName);
+        assert.equal(item.height, 10);
+      }
+      for (const text of ["TypeScript, Python", "React"]) {
+        const item = items.find((item) => item.str.trim() === text);
+        assert.ok(item);
+        assert.equal(item.fontName, regular.fontName);
+        assert.equal(item.height, 10);
+      }
+      assert.notEqual(bold.fontName, regular.fontName);
+    } finally {
+      await document.loadingTask.destroy();
+    }
+  }
+});
+
+test("spacing changes line, paragraph and section distances without changing font sizes", async () => {
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex" },
+    summary: "First line\nSecond line",
+    skills: { Languages: ["TypeScript"], Frontend: ["React"] },
+  });
+  const measurements: number[][] = [];
+  for (const spacing of [
+    undefined,
+    { lineHeight: 1.8, paragraph: 8, section: 20 },
+  ]) {
+    const document = await readPdf(data, "engineer", undefined, spacing);
+    try {
+      const content = await (await document.getPage(1)).getTextContent();
+      const items = content.items.filter((item) => "str" in item);
+      const get = (text: string) => {
+        const item = items.find((item) => item.str.trim() === text);
+        assert.ok(item, `Missing ${text}`);
+        return item;
+      };
+      measurements.push([
+        get("First line").transform[5] - get("Second line").transform[5],
+        get("Languages:").transform[5] - get("Frontend:").transform[5],
+        get("Second line").transform[5] - get("Skills").transform[5],
+      ]);
+      assert.equal(get("First line").height, 10);
+      assert.equal(get("Alex").height, 14);
+    } finally {
+      await document.loadingTask.destroy();
+    }
+  }
+  for (let index = 0; index < 3; index++)
+    assert.ok(measurements[1][index] > measurements[0][index]);
+  assert.ok(Math.abs(measurements[0][0] - 13.5) < 0.01);
+  assert.ok(Math.abs(measurements[1][0] - 18) < 0.01);
 });
 
 test("PDF contains independent default/custom font sizes and never prints target company", async () => {

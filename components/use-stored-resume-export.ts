@@ -6,6 +6,7 @@ import { parseStoredResumeExport, RESUME_STORAGE_KEY } from "@/lib/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
 import type { ResumeData } from "@/types/resume";
 import type { ResumeFontSizes } from "@/lib/resume-typography";
+import type { ResumeSpacing } from "@/lib/resume-spacing";
 
 export type StoredResumeExportState =
   | { status: "loading"; message: string }
@@ -15,6 +16,7 @@ export type StoredResumeExportState =
       resumeData: ResumeData;
       templateId: ResumeTemplateId;
       fontSizes: ResumeFontSizes;
+      spacing: ResumeSpacing;
     };
 
 const SERVER_RESUME_SNAPSHOT = "__resume_forge_server_snapshot__";
@@ -69,6 +71,7 @@ function getExportState(
       resumeData: storedResumeExport.resumeData,
       templateId: storedResumeExport.templateId,
       fontSizes: storedResumeExport.fontSizes,
+      spacing: storedResumeExport.spacing,
     };
   } catch {
     return {

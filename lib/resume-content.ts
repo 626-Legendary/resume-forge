@@ -8,6 +8,7 @@ export type ResumeLine = {
   kind: "name" | "contact" | "section" | "heading" | "body" | "bullet";
   link?: string;
   parts?: ResumeInline[];
+  label?: string;
 };
 
 export function safeResumeUrl(value?: string): string | undefined {
@@ -83,9 +84,13 @@ export function buildResumeLines(
   const skills = () => {
     if (!data.skills || !Object.keys(data.skills).length) return;
     add("Skills", "section");
-    Object.entries(data.skills).forEach(([category, values]) =>
-      add(`${category}: ${values.join(", ")}`),
-    );
+    Object.entries(data.skills).forEach(([category, values]) => {
+      lines.push({
+        text: `${category}: ${values.join(", ")}`,
+        kind: "body",
+        label: `${category}:`,
+      });
+    });
   };
   const experience = () => {
     if (!data.experiences?.length) return;

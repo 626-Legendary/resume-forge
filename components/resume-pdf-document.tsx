@@ -13,34 +13,45 @@ import {
   normalizeResumeFontSizes,
   type ResumeFontSizes,
 } from "@/lib/resume-typography";
+import {
+  normalizeResumeSpacing,
+  type ResumeSpacing,
+} from "@/lib/resume-spacing";
 
 // Preserve words and reading order in extracted PDF text.
 Font.registerHyphenationCallback((word) => [word]);
-const styles = StyleSheet.create({
-  page: {
-    padding: 36,
-    fontFamily: "Helvetica",
-    lineHeight: 1.35,
-    color: "#111111",
-  },
-  name: {
-    fontFamily: "Helvetica-Bold",
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  contact: { textAlign: "center", marginBottom: 3 },
-  section: {
-    fontFamily: "Helvetica-Bold",
-    borderBottomWidth: 0.7,
-    paddingBottom: 3,
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  heading: { fontFamily: "Helvetica-Bold", marginTop: 4, marginBottom: 2 },
-  body: { marginBottom: 3 },
-  bullet: { paddingLeft: 10, marginBottom: 3 },
-  link: { color: "#111111", textDecoration: "none" },
-});
+function createStyles(spacing: ResumeSpacing) {
+  return StyleSheet.create({
+    page: {
+      padding: 36,
+      fontFamily: "Helvetica",
+      lineHeight: spacing.lineHeight,
+      color: "#111111",
+    },
+    name: {
+      fontFamily: "Helvetica-Bold",
+      textAlign: "center",
+      marginBottom: spacing.paragraph + 2,
+    },
+    contact: { textAlign: "center", marginBottom: spacing.paragraph },
+    section: {
+      fontFamily: "Helvetica-Bold",
+      borderBottomWidth: 0.7,
+      paddingBottom: 3,
+      marginTop: spacing.section,
+      marginBottom: spacing.paragraph + 2,
+    },
+    heading: {
+      fontFamily: "Helvetica-Bold",
+      marginTop: spacing.paragraph + 1,
+      marginBottom: (spacing.paragraph * 2) / 3,
+    },
+    body: { marginBottom: spacing.paragraph },
+    bullet: { paddingLeft: 10, marginBottom: spacing.paragraph },
+    skillLabel: { fontFamily: "Helvetica-Bold" },
+    link: { color: "#111111", textDecoration: "none" },
+  });
+}
 
 // The built-in PDF font lacks arrow glyphs; preserve their meaning as ASCII.
 function printableText(text: string) {
@@ -51,12 +62,15 @@ export default function ResumePdfDocument({
   data,
   templateId,
   fontSizes,
+  spacing,
 }: {
   data: ResumeData;
   templateId: ResumeTemplateId;
   fontSizes?: ResumeFontSizes;
+  spacing?: ResumeSpacing;
 }) {
   const sizes = normalizeResumeFontSizes(fontSizes);
+  const styles = createStyles(normalizeResumeSpacing(spacing));
   return (
     <Document
       title={`${data.basicInfo.name} Resume`}
@@ -88,7 +102,14 @@ export default function ResumePdfDocument({
                   : 0
             }
           >
-            {line.parts ? (
+            {line.label ? (
+              <>
+                <Text style={styles.skillLabel}>
+                  {printableText(line.label)}
+                </Text>
+                {printableText(line.text.slice(line.label.length))}
+              </>
+            ) : line.parts ? (
               line.parts.map((part, partIndex) => (
                 <Text key={partIndex}>
                   {partIndex > 0 ? " | " : ""}

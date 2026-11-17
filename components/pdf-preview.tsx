@@ -119,7 +119,16 @@ export default function PdfPreview({
       <details className="resume-text">
         <summary>Read resume text</summary>
         {buildResumeLines(data, templateId).map((line, index) => (
-          <p key={index}>{line.text}</p>
+          <p key={index}>
+            {line.label ? (
+              <>
+                <strong>{line.label}</strong>
+                {line.text.slice(line.label.length)}
+              </>
+            ) : (
+              line.text
+            )}
+          </p>
         ))}
       </details>
     </div>

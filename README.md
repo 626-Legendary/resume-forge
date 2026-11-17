@@ -12,6 +12,9 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 - Add independent **Name**, **Section titles** and **Body text** font-size controls, defaulting to **14pt**, **12pt** and **10pt**. Choose 6–32pt in 0.5pt increments. Body size includes contact information, entry headings, links and bullets.
 - Font changes automatically regenerate the same PDF used for preview and download, including page breaks and page count. Export waits for the current settings; **Reset** restores the default sizes.
 - Compact contact layout: phone, email and location share the first row; LinkedIn, GitHub and website links share the next row, separated by `|` with independent clickable targets. Rows wrap automatically when needed. Additional plain-text status notes remain below the links.
+- Skills category labels such as **Languages:** and **Frontend:** are bold; their values keep the regular body font.
+- Add **Spacing** controls for line spacing (default 1.35), paragraph gap (default 3pt) and section gap (default 10pt). Changes automatically update preview, pagination and export. Line spacing supports 1–2 in 0.05 steps; paragraph gap supports 0–12pt and section gap 0–24pt in whole points.
+- **Restore font defaults** resets only the font sizes to 14/12/10pt. **Restore spacing defaults** resets only spacing to 1.35/3/10. Both preserve resume JSON, parsed content and the selected template. The main **Reset** clears the input back to the empty schema and restores all layout defaults.
 - Preserve old JSON without a company field and migrate company metadata from 1.0.4 compatibility exports.
 
 ## Core features
@@ -41,7 +44,7 @@ Open `http://localhost:3000/dashboard`.
 1. Paste your JSON or select **Load example**.
 2. Select **Parse JSON** after changing content.
 3. Choose Engineer or Engineer Intern. The intern template places Education before Skills and Experience.
-4. Adjust **Name (pt)**, **Section titles (pt)** and **Body text (pt)** as needed. To name the export for a company, set `basicInfo["company-name"]` in JSON and parse again.
+4. Adjust **Name (pt)**, **Section titles (pt)**, **Body text (pt)** and **Spacing** as needed. To name the export for a company, set `basicInfo["company-name"]` in JSON and parse again. Use the independent restore buttons to reset fonts or spacing without losing your resume.
 5. Review the page count, page breaks and content. Open **Read resume text** for an accessible text alternative.
 6. Select **Export PDF** to download the document.
 
@@ -143,9 +146,11 @@ PDF generation uses `@react-pdf/renderer`; PDF.js paints the resulting pages for
 
 The current PDF font targets English and Western Latin resumes. CJK scripts and emoji require a suitable embedded font before they can be supported reliably. US Letter is the only paper preset in this release. The canvas preview has a separate readable text view; text selection and link interaction are available in the downloaded PDF.
 
-Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content and font settings in memory and stores only the simple-mode preference. Reloading clears your current input and restores default font sizes. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
+Downloaded PDF hyperlinks use standard URI actions. Whether a website opens in the same tab, a new tab or another browser window is controlled by the PDF reader/browser and its preferences. A website URI action has no portable equivalent of HTML `target="_blank"`; the PDF `NewWindow` flag applies to other action types and cannot reliably force website links into a new window across readers. See Adobe's [PDF Reference, URI Actions, pp. 602–603](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.5_v6.pdf#page=624). The app preserves clickable URLs without adding reader-specific JavaScript actions.
 
-`/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts legacy raw resumes and `{ resumeData, templateId, fontSizes? }` payloads, uses the same PDF pipeline and offers a download link. `fontSizes` has `{ name, section, body }` numeric values; missing or invalid individual sizes use their defaults. A legacy 1.0.4 `companyName` is migrated only when `basicInfo` has no `company-name` field; an explicit new value, including an empty string, takes precedence. The main dashboard downloads directly and does not write resumes to local storage. Simple mode is a visual preference, not an authentication or privacy boundary.
+Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content, font sizes and spacing in memory and stores only the simple-mode preference. Reloading clears your current input and restores layout defaults. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
+
+`/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts legacy raw resumes and `{ resumeData, templateId, fontSizes?, spacing? }` payloads, uses the same PDF pipeline and offers a download link. `fontSizes` has `{ name, section, body }` numeric values and `spacing` has `{ lineHeight, paragraph, section }`; missing or invalid individual settings use their defaults. A legacy 1.0.4 `companyName` is migrated only when `basicInfo` has no `company-name` field; an explicit new value, including an empty string, takes precedence. The main dashboard downloads directly and does not write resumes to local storage. Simple mode is a visual preference, not an authentication or privacy boundary.
 
 ## Architecture
 
@@ -159,6 +164,7 @@ Resume parsing, PDF generation and previews run in the browser. The dashboard ke
 | `components/pdf-preview.tsx`         | Actual PDF page count, canvas rendering and readable text alternative              |
 | `components/use-builder.ts`          | Input, parsed snapshot, template and font-size state                               |
 | `lib/resume-typography.ts`           | Font defaults, supported sizes and stored-setting validation                       |
+| `lib/resume-spacing.ts`              | Line, paragraph and section spacing defaults, options and validation               |
 | `components/resume-builder.tsx`      | Shared dashboard UI and download interaction                                       |
 | `components/resume-export-view.tsx`  | Shared legacy export UI                                                            |
 

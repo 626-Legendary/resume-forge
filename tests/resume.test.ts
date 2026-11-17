@@ -12,6 +12,10 @@ import {
   DEFAULT_RESUME_FONT_SIZES,
   normalizeResumeFontSizes,
 } from "../lib/resume-typography";
+import {
+  DEFAULT_RESUME_SPACING,
+  normalizeResumeSpacing,
+} from "../lib/resume-spacing";
 
 test("filename uses company, full name and a local English date", () => {
   assert.equal(
@@ -183,6 +187,53 @@ test("links reject executable schemes", () => {
   assert.equal(safeResumeUrl("javascript:alert(1)"), undefined);
   assert.equal(safeResumeUrl("data:text/html,test"), undefined);
   assert.equal(safeResumeUrl("github.com/alex"), "https://github.com/alex");
+});
+
+test("skill category labels remain separate from regular-weight values", () => {
+  const data = normalizeResumeData({
+    basicInfo: { name: "Alex" },
+    skills: { Languages: ["TypeScript", "Python"], Frontend: ["React"] },
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const lines = buildResumeLines(data, template).filter((line) => line.label);
+    assert.deepEqual(
+      lines.map((line) => ({ text: line.text, label: line.label })),
+      [
+        { text: "Languages: TypeScript, Python", label: "Languages:" },
+        { text: "Frontend: React", label: "Frontend:" },
+      ],
+    );
+  }
+});
+
+test("spacing settings validate independently and survive stored-export round trips", () => {
+  assert.deepEqual(normalizeResumeSpacing(undefined), {
+    lineHeight: 1.35,
+    paragraph: 3,
+    section: 10,
+  });
+  for (const invalid of [NaN, Infinity, -1, "2", null, [], {}]) {
+    assert.deepEqual(
+      normalizeResumeSpacing({
+        lineHeight: invalid,
+        paragraph: invalid,
+        section: invalid,
+      }),
+      DEFAULT_RESUME_SPACING,
+    );
+  }
+  assert.deepEqual(
+    normalizeResumeSpacing({ lineHeight: 1.8, paragraph: 2.5, section: 50 }),
+    { lineHeight: 1.8, paragraph: 3, section: 10 },
+  );
+  const data = normalizeResumeData({ basicInfo: { name: "Alex" } });
+  const spacing = { lineHeight: 1.6, paragraph: 6, section: 18 };
+  const stored = createStoredResumeExport(data, "engineer", undefined, spacing);
+  assert.deepEqual(parseStoredResumeExport(JSON.stringify(stored)), stored);
+  assert.deepEqual(
+    parseStoredResumeExport(JSON.stringify(data)).spacing,
+    DEFAULT_RESUME_SPACING,
+  );
 });
 
 test("contact profiles share one row with independent safe links and no empty separators", () => {
