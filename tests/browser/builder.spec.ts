@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import schema from "../../constants/default.json" with { type: "json" };
+import { RESUME_PREFERENCES_KEY } from "../../lib/resume-preferences";
 
 let browserErrors: string[] = [];
 test.beforeEach(async ({ page }) => {
@@ -217,6 +218,174 @@ test("font and spacing defaults restore independently without clearing JSON or t
   await expect(page.getByRole("button", { name: "Export PDF" })).toBeDisabled();
 });
 
+test("layout preferences and restored defaults survive refresh independently", async ({
+  page,
+}) => {
+  await page.goto("/dashboard");
+  await page.getByRole("button", { name: "Load example" }).click();
+  await page.getByLabel("Name (pt)", { exact: true }).selectOption("20");
+  await page.getByLabel("Section titles (pt)").selectOption("16");
+  await page.getByLabel("Body text (pt)").selectOption("12");
+  await page.getByLabel("Line spacing", { exact: true }).selectOption("1.8");
+  await page.getByLabel("Paragraph gap (pt)").selectOption("6");
+  await page.getByLabel("Section gap (pt)").selectOption("18");
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("20");
+  await expect(page.getByLabel("Section titles (pt)")).toHaveValue("16");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("12");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.8",
+  );
+  await expect(page.getByLabel("Paragraph gap (pt)")).toHaveValue("6");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("18");
+  // Resume content is still kept only in memory, independently of layout preferences.
+  expect(JSON.parse(await page.locator("#resume-json").inputValue())).toEqual(
+    schema,
+  );
+  await page.getByRole("button", { name: "Restore font defaults" }).click();
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Section titles (pt)")).toHaveValue("12");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("10");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.8",
+  );
+  await expect(page.getByLabel("Paragraph gap (pt)")).toHaveValue("6");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("18");
+  await page.getByLabel("Name (pt)", { exact: true }).selectOption("18");
+  await page.getByRole("button", { name: "Restore spacing defaults" }).click();
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("18");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.35",
+  );
+  await expect(page.getByLabel("Paragraph gap (pt)")).toHaveValue("3");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("10");
+  await page.getByLabel("Line spacing", { exact: true }).selectOption("1.6");
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.35",
+  );
+  const saved = await page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key)!),
+    RESUME_PREFERENCES_KEY,
+  );
+  expect(saved).toEqual({
+    fontSizes: { name: 14, section: 12, body: 10 },
+    spacing: { lineHeight: 1.35, paragraph: 3, section: 10 },
+  });
+});
+
+test("bad saved preferences recover per field without overwriting valid values on startup", async ({
+  page,
+}) => {
+  await page.goto("/dashboard");
+  await page.evaluate(
+    (key) => localStorage.setItem(key, "{broken"),
+    RESUME_PREFERENCES_KEY,
+  );
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.35",
+  );
+  const stored = JSON.stringify({
+    fontSizes: { name: 20, section: "bad", body: 999 },
+    spacing: { lineHeight: 1.8, paragraph: -1, section: 18 },
+  });
+  await page.evaluate(({ key, stored }) => localStorage.setItem(key, stored), {
+    key: RESUME_PREFERENCES_KEY,
+    stored,
+  });
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("20");
+  await expect(page.getByLabel("Section titles (pt)")).toHaveValue("12");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("10");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.8",
+  );
+  await expect(page.getByLabel("Paragraph gap (pt)")).toHaveValue("3");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("18");
+  expect(
+    await page.evaluate(
+      (key) => localStorage.getItem(key),
+      RESUME_PREFERENCES_KEY,
+    ),
+  ).toBe(stored);
+  await page.getByLabel("Body text (pt)").selectOption("11");
+  await page.reload();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("20");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("11");
+  await expect(page.getByLabel("Section gap (pt)")).toHaveValue("18");
+});
+
+test("layout edits synchronize across tabs without losing the other setting group", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/dashboard");
+  const second = await context.newPage();
+  try {
+    await second.goto("/dashboard");
+    await page.getByLabel("Name (pt)", { exact: true }).selectOption("20");
+    await expect(second.getByLabel("Name (pt)", { exact: true })).toHaveValue(
+      "20",
+    );
+    await second
+      .getByLabel("Line spacing", { exact: true })
+      .selectOption("1.8");
+    await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+      "1.8",
+    );
+    await page.getByRole("button", { name: "Restore font defaults" }).click();
+    await expect(second.getByLabel("Name (pt)", { exact: true })).toHaveValue(
+      "14",
+    );
+    await expect(
+      second.getByLabel("Line spacing", { exact: true }),
+    ).toHaveValue("1.8");
+  } finally {
+    await second.close();
+  }
+});
+
+test("layout controls and restores still work when preference storage is unavailable", async ({
+  page,
+}) => {
+  await page.addInitScript((key) => {
+    const read = Storage.prototype.getItem;
+    const write = Storage.prototype.setItem;
+    Storage.prototype.getItem = function (name) {
+      if (name === key)
+        throw new DOMException("Storage blocked", "SecurityError");
+      return read.call(this, name);
+    };
+    Storage.prototype.setItem = function (name, value) {
+      if (name === key)
+        throw new DOMException("Storage blocked", "QuotaExceededError");
+      return write.call(this, name, value);
+    };
+  }, RESUME_PREFERENCES_KEY);
+  await page.goto("/dashboard");
+  await page.getByLabel("Name (pt)", { exact: true }).selectOption("20");
+  await page.getByLabel("Line spacing", { exact: true }).selectOption("1.8");
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("20");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.8",
+  );
+  await page.getByRole("button", { name: "Restore font defaults" }).click();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.8",
+  );
+  await page.getByRole("button", { name: "Restore spacing defaults" }).click();
+  await expect(page.getByLabel("Line spacing", { exact: true })).toHaveValue(
+    "1.35",
+  );
+});
+
 test("export reports missing data and renders legacy storage", async ({
   page,
 }) => {
@@ -287,7 +456,7 @@ test("dashboard branding, personal-project footer and complete JSON writing guid
   await expect(brand).toHaveAttribute("href", "/");
   await expect(brand.locator("img")).toBeVisible();
   const footer = page.locator(".builder-footer");
-  await expect(footer).toContainText("v1.0.6");
+  await expect(footer).toContainText("v1.0.7");
   await expect(footer).toContainText("An independent personal project");
   await expect(footer).toContainText("Zexiang Zhang");
   await expect(

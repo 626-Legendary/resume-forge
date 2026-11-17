@@ -1,4 +1,4 @@
-# Resume Forge 1.0.6
+# Resume Forge 1.0.7
 
 A JSON-powered resume builder for AI-assisted job applications. Paste structured content, review every US Letter page, and download the same PDF shown in the preview.
 
@@ -6,7 +6,14 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 
 ![Resume Forge](./public/og-image.png)
 
-## What changed in 1.0.6
+## What changed in 1.0.7
+
+- Font sizes and spacing are saved automatically in this browser and restored after refresh, navigation or reopening the dashboard on the same site.
+- **Restore font defaults** saves 14/12/10pt while preserving your saved spacing. **Restore spacing defaults** saves 1.35/3/10 while preserving your saved font sizes. The main **Reset** saves both groups of defaults.
+- Changes synchronize across dashboard tabs. Loading a page reads preferences without overwriting them with initial defaults. Missing or invalid individual values use their defaults; malformed storage does not prevent editing.
+- Only layout preferences are saved by this feature. Resume JSON and parsed resume content remain in memory.
+
+## 1.0.6 improvements
 
 - Rename the dashboard toggle to **Light mode on/off**, preserving existing saved preferences and the light interface's motion-free behavior.
 - Separate Font sizes and Spacing with a visible divider in both themes.
@@ -38,7 +45,7 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 - Shared content, layout, rendering and builder modules replace duplicate dashboards, HTML templates and export implementations.
 - Updated Next.js to 16.4.6 and refreshed compatible dependencies to address the existing dependency audit findings.
 
-Design specifications are in [docs/UIUX-1.0.4.md](./docs/UIUX-1.0.4.md), [docs/UIUX-1.0.5.md](./docs/UIUX-1.0.5.md) and the current [1.0.6 interface update](./docs/UIUX-1.0.6.md).
+Design specifications are in [docs/UIUX-1.0.4.md](./docs/UIUX-1.0.4.md), [docs/UIUX-1.0.5.md](./docs/UIUX-1.0.5.md), [docs/UIUX-1.0.6.md](./docs/UIUX-1.0.6.md) and the current [1.0.7 preferences update](./docs/UIUX-1.0.7.md).
 
 ## Get started
 
@@ -166,7 +173,9 @@ The current PDF font targets English and Western Latin resumes. CJK scripts and 
 
 Downloaded PDF hyperlinks use standard URI actions. Whether a website opens in the same tab, a new tab or another browser window is controlled by the PDF reader/browser and its preferences. A website URI action has no portable equivalent of HTML `target="_blank"`; the PDF `NewWindow` flag applies to other action types and cannot reliably force website links into a new window across readers. See Adobe's [PDF Reference, URI Actions, pp. 602–603](https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/pdfreference1.5_v6.pdf#page=624). The app preserves clickable URLs without adding reader-specific JavaScript actions.
 
-Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content, font sizes and spacing in memory and stores only the light-mode preference. Reloading clears your current input and restores layout defaults. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
+Resume parsing, PDF generation and previews run in the browser. Resume JSON and parsed content stay in memory and are cleared on reload. The light-mode preference is stored separately, and `resume-forge-layout-preferences` stores only the validated font sizes and spacing values. Reloading restores those saved layout preferences. Restore buttons persist the selected defaults rather than reverting to an older custom value after refresh. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
+
+Preferences are local to the browser and site origin. Clearing site data removes them. If browser storage is blocked or full, layout controls continue working for the current page; persistence across reload requires available local storage.
 
 `/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts legacy raw resumes and `{ resumeData, templateId, fontSizes?, spacing? }` payloads, uses the same PDF pipeline and offers a download link. `fontSizes` has `{ name, section, body }` numeric values and `spacing` has `{ lineHeight, paragraph, section }`; missing or invalid individual settings use their defaults. A legacy 1.0.4 `companyName` is migrated only when `basicInfo` has no `company-name` field; an explicit new value, including an empty string, takes precedence. The main dashboard downloads directly and does not write resumes to local storage. Light mode is a visual preference, not an authentication or privacy boundary.
 
@@ -182,6 +191,8 @@ Resume parsing, PDF generation and previews run in the browser. The dashboard ke
 | `components/use-resume-pdf.ts`       | Lazy PDF generation, serialized jobs, stale-result protection and blob URL cleanup |
 | `components/pdf-preview.tsx`         | Actual PDF page count, canvas rendering and readable text alternative              |
 | `components/use-builder.ts`          | Input, parsed snapshot, template and font-size state                               |
+| `components/use-stored-layout.ts`    | Browser layout preference storage, synchronization and persistent reset actions    |
+| `lib/resume-preferences.ts`          | Preference key, JSON parsing and validation of stored layout settings              |
 | `lib/resume-typography.ts`           | Font defaults, supported sizes and stored-setting validation                       |
 | `lib/resume-spacing.ts`              | Line, paragraph and section spacing defaults, options and validation               |
 | `components/resume-builder.tsx`      | Shared dashboard UI and download interaction                                       |
@@ -204,10 +215,11 @@ npm start
 
 Unit and PDF integration tests verify input validation, normalization, company metadata migration and omission from resume content, legacy exports, filename/date handling, safe links, template order, default/custom font sizes extracted from actual PDFs, Letter dimensions, multiple pages and preservation/ordering of long content. Changing body size is checked for correct repagination without missing records.
 
-Playwright tests exercise mode persistence and motion suppression, JSON company-based filenames, removal of the manual company input, font controls and actual font sizes in the downloaded PDF, stale-input protection, template changes, invalid input, reset, mobile layout and the compatibility export route. Chromium is required. The test runner builds the app and starts its own production server on port 3104; screenshots and failure traces are placed in ignored `test-results/`.
+Playwright tests exercise mode persistence and motion suppression, JSON company-based filenames, removal of the manual company input, font controls and actual font sizes in the downloaded PDF, stale-input protection, template changes, invalid input, reset, mobile layout and the compatibility export route. Preference tests additionally cover refresh recovery, persistent independent restores, the main Reset, corrupted stored data, cross-tab updates and unavailable storage. Chromium is required. The test runner builds the app and starts its own production server on port 3104; screenshots and failure traces are placed in ignored `test-results/`.
 
 ## Earlier releases
 
+- **1.0.6** — Refined landing/dashboard identity, complete JSON help, shared footer, two-line Experience headers and AI link-wrapper normalization.
 - **1.0.5** — JSON-based company metadata, independent font sizes, compact profile links, bold Skills labels, spacing controls and separate layout reset actions.
 - **1.0.4** — Actual paginated Letter PDF preview/download, simple mode, shared rendering modules, private-route removal, regression tests and dependency security updates.
 - **1.0.3** — Layout fixes and the original PrivateDashboard interface.
