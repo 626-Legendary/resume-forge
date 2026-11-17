@@ -23,6 +23,7 @@ export const mockResumeJson: ResumeData = mockResumeJsonSource;
 export type StoredResumeExport = {
   resumeData: ResumeData;
   templateId: ResumeTemplateId;
+  companyName?: string;
 };
 
 export function stringifyResumeJson(input: unknown): string {
@@ -34,8 +35,14 @@ export function parseResumeJson(jsonInput: string): ResumeData {
 }
 
 export function normalizeResumeData(input: unknown): ResumeData {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    throw new Error("Resume JSON must be an object with basicInfo.name.");
+  }
   const source = toRecord(input);
   const basicInfo = toRecord(source.basicInfo);
+  if (typeof basicInfo.name !== "string" || !basicInfo.name.trim()) {
+    throw new Error("Please provide a non-empty basicInfo.name.");
+  }
   const contact = toRecord(basicInfo.contact);
 
   return {
@@ -59,16 +66,18 @@ export function normalizeResumeData(input: unknown): ResumeData {
 
 export function createStoredResumeExport(
   resumeData: ResumeData,
-  templateId: ResumeTemplateId
+  templateId: ResumeTemplateId,
+  companyName = "",
 ): StoredResumeExport {
   return {
     resumeData,
     templateId,
+    companyName,
   };
 }
 
 export function parseStoredResumeExport(
-  storedResumeJson: string
+  storedResumeJson: string,
 ): StoredResumeExport {
   const parsed = JSON.parse(storedResumeJson);
   const source = toRecord(parsed);
@@ -76,6 +85,7 @@ export function parseStoredResumeExport(
   if ("resumeData" in source) {
     return {
       resumeData: normalizeResumeData(source.resumeData),
+      companyName: toText(source.companyName),
       templateId: isResumeTemplateId(source.templateId)
         ? source.templateId
         : DEFAULT_RESUME_TEMPLATE_ID,
@@ -116,7 +126,7 @@ function normalizeExperiences(value: unknown): Experience[] | undefined {
         Boolean(experience.title) ||
         Boolean(experience.location) ||
         Boolean(experience.date) ||
-        Boolean(experience.description?.length)
+        Boolean(experience.description?.length),
     );
 
   return experiences.length > 0 ? experiences : undefined;
@@ -137,7 +147,7 @@ function normalizeProjects(value: unknown): Project[] | undefined {
         Boolean(project.url) ||
         Boolean(project.date) ||
         Boolean(project.tools?.length) ||
-        Boolean(project.description?.length)
+        Boolean(project.description?.length),
     );
 
   return projects.length > 0 ? projects : undefined;
@@ -168,7 +178,7 @@ function normalizeEducation(value: unknown): Education[] | undefined {
         Boolean(item.endDate) ||
         Boolean(item.gpa) ||
         Boolean(item.honors?.length) ||
-        Boolean(item.description?.length)
+        Boolean(item.description?.length),
     );
 
   return education.length > 0 ? education : undefined;
@@ -191,14 +201,14 @@ function normalizeCertifications(value: unknown): Certification[] | undefined {
         Boolean(item.date) ||
         Boolean(item.expirationDate) ||
         Boolean(item.credentialId) ||
-        Boolean(item.url)
+        Boolean(item.url),
     );
 
   return certifications.length > 0 ? certifications : undefined;
 }
 
 function normalizeContactExtra(
-  value: unknown
+  value: unknown,
 ): Record<string, ContactExtraEntry> | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return undefined;
@@ -206,7 +216,7 @@ function normalizeContactExtra(
 
   const source = toRecord(value);
   const normalizedEntries: Array<[string, ContactExtraEntry]> = Object.entries(
-    source
+    source,
   )
     .map(([key, entryValue]) => {
       const normalizedEntry = normalizeContactExtraEntry(entryValue);
@@ -223,7 +233,7 @@ function normalizeContactExtra(
 }
 
 function normalizeContactExtraEntry(
-  value: unknown
+  value: unknown,
 ): ContactExtraEntry | undefined {
   if (typeof value === "string") {
     const text = toText(value);

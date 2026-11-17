@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 import { parseStoredResumeExport, RESUME_STORAGE_KEY } from "@/lib/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
@@ -13,6 +13,7 @@ export type StoredResumeExportState =
       status: "ready";
       resumeData: ResumeData;
       templateId: ResumeTemplateId;
+      companyName: string;
     };
 
 const SERVER_RESUME_SNAPSHOT = "__resume_forge_server_snapshot__";
@@ -21,10 +22,10 @@ export function useStoredResumeExport(): StoredResumeExportState {
   const storedResumeJson = useSyncExternalStore(
     subscribeToResumeStorage,
     getStoredResumeJson,
-    getServerStoredResumeJson
+    getServerStoredResumeJson,
   );
 
-  return getExportState(storedResumeJson);
+  return useMemo(() => getExportState(storedResumeJson), [storedResumeJson]);
 }
 
 function subscribeToResumeStorage(onStoreChange: () => void) {
@@ -33,14 +34,20 @@ function subscribeToResumeStorage(onStoreChange: () => void) {
 }
 
 function getStoredResumeJson() {
-  return window.localStorage.getItem(RESUME_STORAGE_KEY);
+  try {
+    return window.localStorage.getItem(RESUME_STORAGE_KEY);
+  } catch {
+    return null;
+  }
 }
 
 function getServerStoredResumeJson() {
   return SERVER_RESUME_SNAPSHOT;
 }
 
-function getExportState(storedResumeJson: string | null): StoredResumeExportState {
+function getExportState(
+  storedResumeJson: string | null,
+): StoredResumeExportState {
   if (storedResumeJson === SERVER_RESUME_SNAPSHOT) {
     return { status: "loading", message: "Loading resume preview..." };
   }
@@ -60,6 +67,7 @@ function getExportState(storedResumeJson: string | null): StoredResumeExportStat
       status: "ready",
       resumeData: storedResumeExport.resumeData,
       templateId: storedResumeExport.templateId,
+      companyName: storedResumeExport.companyName || "",
     };
   } catch {
     return {

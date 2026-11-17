@@ -42,3 +42,7 @@ next-env.d.ts
 
 # dev
 dev.md
+# Generated PDF worker and browser test artifacts
+/public/pdf.worker.min.mjs
+/playwright-report/
+/test-results/

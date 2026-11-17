@@ -410,8 +410,8 @@ export default function Home() {
                 </li>
                 <li className="border-l border-orange-500/40 pl-4">
                   <span className="text-orange-400">3.</span> Export the
-                  finished version and save it as a PDF through the browser
-                  print dialog.
+                  finished version and download the same paginated US Letter
+                  PDF you see in the preview.
                 </li>
               </ol>
 

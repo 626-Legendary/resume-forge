@@ -1,32 +1,43 @@
 {
   "name": "resume-forge",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "author": {
     "name": "Zexiang Zhang",
     "email": "zhangzexiang626@gmail.com",
     "url": "https://tryresumeforge.vercel.app/"
   },
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "tsx --test tests/*.test.ts tests/*.test.tsx",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node scripts/copy-pdf-worker.mjs",
+    "predev": "node scripts/copy-pdf-worker.mjs",
+    "prebuild": "node scripts/copy-pdf-worker.mjs"
   },
   "dependencies": {
-    "next": "16.2.4",
+    "@react-pdf/renderer": "^4.9.0",
+    "next": "^16.4.6",
+    "pdfjs-dist": "^6.5.438",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-icons": "^5.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
+    "eslint-config-next": "^16.4.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
