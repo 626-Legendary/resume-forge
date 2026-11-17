@@ -43,6 +43,57 @@ test("minimal resume is one Letter page with extractable text", async () => {
   }
 });
 
+test("AI-wrapped links export as clean text and direct PDF hyperlinks", async () => {
+  const data = normalizeResumeData({
+    basicInfo: {
+      name: "Alex",
+      contact: {
+        extra: {
+          linkedIn: {
+            content:
+              "[linkedin.com/in/alex](https://www.google.com/search?q=https://linkedin.com/in/alex)",
+            link: "[https://linkedin.com/in/alex](https://www.google.com/search?q=https://linkedin.com/in/alex)",
+          },
+          github: "[github.com/alex](https://github.com/alex)",
+          portfolio: {
+            content:
+              "[alex.example.com](https://www.google.com/search?q=https://alex.example.com)",
+            link: "https://www.google.com/search?q=https%3A%2F%2Falex.example.com",
+          },
+        },
+      },
+    },
+  });
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    const document = await readPdf(data, template);
+    try {
+      const page = await document.getPage(1);
+      const content = await page.getTextContent();
+      const text = content.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ");
+      assert.match(text, /linkedin.com\/in\/alex/);
+      assert.match(text, /github.com\/alex/);
+      assert.match(text, /alex.example.com/);
+      assert.doesNotMatch(text, /google.com|\]\(|\[https/);
+      const annotations = await page.getAnnotations();
+      for (const url of [
+        "https://linkedin.com/in/alex",
+        "https://github.com/alex",
+        "https://alex.example.com/",
+      ])
+        assert.ok(annotations.some((annotation) => annotation.url === url));
+      assert.ok(
+        annotations.every(
+          (annotation) => !annotation.url?.includes("google.com"),
+        ),
+      );
+    } finally {
+      await document.loadingTask.destroy();
+    }
+  }
+});
+
 test("Experience company/location and title/date occupy two rows with correct alignment", async () => {
   const data = normalizeResumeData({
     basicInfo: { name: "Alex" },

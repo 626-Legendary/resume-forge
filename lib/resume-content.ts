@@ -1,5 +1,7 @@
 import type { Experience, ResumeData } from "@/types/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
+import { safeResumeUrl } from "@/lib/resume-links";
+export { safeResumeUrl } from "@/lib/resume-links";
 
 export type ResumeInline = { text: string; link?: string };
 
@@ -11,20 +13,6 @@ export type ResumeLine = {
   label?: string;
   experience?: Pick<Experience, "company" | "location" | "title" | "date">;
 };
-
-export function safeResumeUrl(value?: string): string | undefined {
-  if (!value) return undefined;
-  try {
-    const url = new URL(
-      /^[a-z][a-z\d+.-]*:/i.test(value) ? value : `https://${value}`,
-    );
-    return ["https:", "http:", "mailto:", "tel:"].includes(url.protocol)
-      ? url.href
-      : undefined;
-  } catch {
-    return undefined;
-  }
-}
 
 export function buildResumeLines(
   data: ResumeData,

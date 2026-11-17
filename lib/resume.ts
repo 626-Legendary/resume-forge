@@ -1,5 +1,6 @@
 import defaultResumeJsonSource from "@/constants/default.json";
 import mockResumeJsonSource from "@/constants/mockData.json";
+import { normalizeContactLink, safeResumeUrl } from "@/lib/resume-links";
 import {
   DEFAULT_RESUME_SPACING,
   normalizeResumeSpacing,
@@ -42,7 +43,9 @@ export function stringifyResumeJson(input: unknown): string {
 }
 
 export function parseResumeJson(jsonInput: string): ResumeData {
-  return normalizeResumeData(JSON.parse(jsonInput));
+  const input = jsonInput.trim();
+  const fenced = /^```(?:json)?\s*\n([\s\S]*?)\n\s*```$/i.exec(input);
+  return normalizeResumeData(JSON.parse(fenced ? fenced[1] : input));
 }
 
 export function normalizeResumeData(input: unknown): ResumeData {
@@ -160,7 +163,7 @@ function normalizeProjects(value: unknown): Project[] | undefined {
       name: toText(project.name),
       tools: toOptionalStringArray(project.tools),
       date: toOptionalText(project.date),
-      url: toOptionalText(project.url),
+      url: safeResumeUrl(toOptionalText(project.url)),
       description: toOptionalStringArray(project.description),
     }))
     .filter(
@@ -214,7 +217,7 @@ function normalizeCertifications(value: unknown): Certification[] | undefined {
       date: toOptionalText(item.date),
       expirationDate: toOptionalText(item.expirationDate),
       credentialId: toOptionalText(item.credentialId),
-      url: toOptionalText(item.url),
+      url: safeResumeUrl(toOptionalText(item.url)),
     }))
     .filter(
       (item) =>
@@ -258,8 +261,7 @@ function normalizeContactExtraEntry(
   value: unknown,
 ): ContactExtraEntry | undefined {
   if (typeof value === "string") {
-    const text = toText(value);
-    return text ? { content: text } : undefined;
+    return normalizeContactLink(value);
   }
 
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
@@ -282,7 +284,7 @@ function normalizeContactExtraEntry(
     toOptionalText(source.href) ??
     toOptionalText(source.url);
 
-  return link ? { content, link } : { content };
+  return normalizeContactLink(content, link);
 }
 
 function toRecord(value: unknown): Record<string, unknown> {

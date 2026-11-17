@@ -8,6 +8,7 @@ import {
   normalizeResumeData,
 } from "../lib/resume";
 import { buildResumeLines, safeResumeUrl } from "../lib/resume-content";
+import { normalizeContactLink } from "../lib/resume-links";
 import {
   DEFAULT_RESUME_FONT_SIZES,
   normalizeResumeFontSizes,
@@ -68,7 +69,7 @@ test("normalization trims content and removes empty sections", () => {
   assert.equal(result.experiences, undefined);
   assert.deepEqual(result.basicInfo.contact?.extra?.github, {
     content: "GitHub",
-    link: "github.com/alex",
+    link: "https://github.com/alex",
   });
 });
 
@@ -187,6 +188,110 @@ test("links reject executable schemes", () => {
   assert.equal(safeResumeUrl("javascript:alert(1)"), undefined);
   assert.equal(safeResumeUrl("data:text/html,test"), undefined);
   assert.equal(safeResumeUrl("github.com/alex"), "https://github.com/alex");
+});
+
+test("AI Markdown contact links use clean labels and direct destinations, ignoring extra metadata", () => {
+  const data = parseResumeJson(
+    JSON.stringify({
+      basicInfo: {
+        name: "Alex",
+        contact: {
+          extra: {
+            linkedIn: {
+              content:
+                "[linkedin.com/in/alex](https://www.google.com/search?q=https://linkedin.com/in/alex)",
+              link: "[https://linkedin.com/in/alex](https://www.google.com/search?q=https://linkedin.com/in/alex)",
+              tracking: "ignore",
+            },
+            github: {
+              content: "[github.com/alex](https://github.com/alex)",
+              link: "[https://github.com/alex](https://github.com/alex)",
+            },
+            portfolio: {
+              content:
+                "[alex.example.com/](https://www.google.com/search?q=https://alex.example.com/)",
+              link: "[https://alex.example.com/](https://www.google.com/search?q=https://alex.example.com/)",
+            },
+          },
+        },
+      },
+      aiNotes: "Ignore this unsupported field",
+    }),
+  );
+  assert.deepEqual(data.basicInfo.contact?.extra, {
+    linkedIn: {
+      content: "linkedin.com/in/alex",
+      link: "https://linkedin.com/in/alex",
+    },
+    github: { content: "github.com/alex", link: "https://github.com/alex" },
+    portfolio: {
+      content: "alex.example.com/",
+      link: "https://alex.example.com/",
+    },
+  });
+  assert.ok(!("aiNotes" in data));
+  assert.deepEqual(normalizeResumeData(data), data);
+});
+
+test("wrapped destinations preserve encoded queries and parentheses while rejecting unsafe actions", () => {
+  const target = "https://example.com/profile_(developer)?view=resume&lang=en";
+  assert.equal(
+    safeResumeUrl(
+      `[Portfolio](https://www.google.com/url?url=${encodeURIComponent(target)}&source=ai)`,
+    ),
+    target,
+  );
+  assert.equal(safeResumeUrl(`[Portfolio](${target})`), target);
+  assert.equal(
+    safeResumeUrl("<https://github.com/alex>"),
+    "https://github.com/alex",
+  );
+  assert.equal(safeResumeUrl("[Unsafe](javascript:alert(1))"), undefined);
+  assert.equal(
+    safeResumeUrl(
+      `https://www.google.com/url?q=${encodeURIComponent("javascript:alert(1)")}`,
+    ),
+    undefined,
+  );
+  assert.equal(
+    safeResumeUrl("https://www.google.com/search?q=software+engineering+jobs"),
+    undefined,
+  );
+  assert.deepEqual(normalizeContactLink("[GitHub](https://github.com/alex)"), {
+    content: "GitHub",
+    link: "https://github.com/alex",
+  });
+  assert.deepEqual(normalizeContactLink("[Label](javascript:alert(1))"), {
+    content: "Label",
+  });
+  assert.deepEqual(normalizeContactLink("Open to relocation"), {
+    content: "Open to relocation",
+  });
+});
+
+test("AI JSON fences and project/certification URL wrappers are accepted without repairing truncated data", () => {
+  const input = JSON.stringify({
+    basicInfo: { name: "Alex" },
+    projects: [
+      { name: "Tool", url: "[Project](https://github.com/alex/tool)" },
+    ],
+    certifications: [
+      {
+        name: "Certificate",
+        url: "https://www.google.com/search?q=https%3A%2F%2Fexample.com%2Fverify%3Fid%3D123",
+      },
+    ],
+  });
+  const data = parseResumeJson(`\n\x60\x60\x60json\n${input}\n\x60\x60\x60\n`);
+  assert.equal(data.projects?.[0].url, "https://github.com/alex/tool");
+  assert.equal(
+    data.certifications?.[0].url,
+    "https://example.com/verify?id=123",
+  );
+  assert.throws(
+    () => parseResumeJson('{"basicInfo":{"name":"Alex"},'),
+    SyntaxError,
+  );
 });
 
 test("Experience uses company/location then title/date without empty separators or headers", () => {

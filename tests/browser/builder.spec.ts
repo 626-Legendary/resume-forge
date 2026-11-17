@@ -237,6 +237,43 @@ test("export reports missing data and renders legacy storage", async ({
   ).toHaveAttribute("download", /^Resume_Legacy_User_/);
 });
 
+test("AI JSON wrappers render clean profile labels without search or Markdown noise", async ({
+  page,
+}) => {
+  await page.goto("/dashboard");
+  const input = JSON.stringify({
+    basicInfo: {
+      name: "Alex",
+      contact: {
+        extra: {
+          linkedIn: {
+            content:
+              "[linkedin.com/in/alex](https://www.google.com/search?q=https://linkedin.com/in/alex)",
+            link: "[https://linkedin.com/in/alex](https://www.google.com/search?q=https://linkedin.com/in/alex)",
+          },
+          github: {
+            content: "[github.com/alex](https://github.com/alex)",
+            link: "[https://github.com/alex](https://github.com/alex)",
+          },
+        },
+      },
+    },
+    aiNotes: "Unused AI commentary",
+  });
+  await page
+    .locator("#resume-json")
+    .fill(`\x60\x60\x60json\n${input}\n\x60\x60\x60`);
+  await page.getByRole("button", { name: "Parse JSON", exact: true }).click();
+  await expect(page.locator("canvas")).toHaveCount(1);
+  await page.getByText("Read resume text", { exact: true }).click();
+  const text = page.locator(".resume-text");
+  await expect(text).toContainText("linkedin.com/in/alex | github.com/alex");
+  await expect(text).not.toContainText("google.com");
+  await expect(text).not.toContainText("](");
+  await expect(text).not.toContainText("Unused AI commentary");
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
+});
+
 test("dashboard branding, personal-project footer and complete JSON writing guide", async ({
   page,
   context,

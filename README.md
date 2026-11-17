@@ -152,6 +152,14 @@ Return only valid JSON, without Markdown fences.
 
 ## PDF behavior and privacy
 
+### AI input cleanup
+
+Resume Forge accepts valid JSON on its own or inside a complete Markdown JSON code fence. Profile labels such as `[github.com/alex](https://github.com/alex)` display as `github.com/alex`, preserving the clickable destination. Markdown-wrapped link fields and Google `/search?q=...` or `/url?url=...` wrappers are unwrapped locally when they contain a direct HTTP(S) URL. Search phrases and unsupported link schemes are not used as destinations. No URL is visited during cleanup.
+
+The same URL cleanup applies to projects and certifications. Unsupported extra JSON metadata is ignored; resume content, work-status text, meaningful URL query parameters and entry order are preserved. Input must still be valid, complete JSON: truncated objects are not automatically repaired or filled with invented data.
+
+### PDF output
+
 PDF generation uses `@react-pdf/renderer`; PDF.js paints the resulting pages for preview. The download contains actual text and hyperlinks, using a single column, conventional section headings, Helvetica and 36pt margins. The default font sizes are 14pt for the name, 12pt for section titles and 10pt for all body text. Each is independently adjustable. Long paragraphs and lists flow onto subsequent pages with heading and widow/orphan protection; increasing font sizes can increase page count. These choices support ATS text extraction, but parsing varies between vendors and is not universally guaranteed.
 
 The current PDF font targets English and Western Latin resumes. CJK scripts and emoji require a suitable embedded font before they can be supported reliably. US Letter is the only paper preset in this release. The canvas preview has a separate readable text view; text selection and link interaction are available in the downloaded PDF.
@@ -168,6 +176,7 @@ Resume parsing, PDF generation and previews run in the browser. The dashboard ke
 | ------------------------------------ | ---------------------------------------------------------------------------------- |
 | `lib/resume.ts`                      | Input validation, normalization and legacy storage parsing                         |
 | `lib/resume-content.ts`              | Ordered text content and safe hyperlinks for both templates                        |
+| `lib/resume-links.ts`                | Local cleanup of AI Markdown/Google link wrappers and URL validation               |
 | `lib/export-filename.ts`             | Filesystem-safe company/name/local-date filename                                   |
 | `components/resume-pdf-document.tsx` | Letter PDF typography, margins and page wrapping                                   |
 | `components/use-resume-pdf.ts`       | Lazy PDF generation, serialized jobs, stale-result protection and blob URL cleanup |

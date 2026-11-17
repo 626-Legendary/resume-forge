@@ -21,6 +21,8 @@
 
 ## Verification
 
+AI input normalization: accept complete JSON code fences, remove Markdown link syntax from contact labels, and recover direct destinations from Markdown and Google search/redirect wrappers. Reuse the same URL handling for projects and certifications. Preserve meaningful labels and query parameters; ignore unsupported metadata and non-URL search queries. Never fetch the targets or guess missing data from truncated JSON. Verify clean extracted PDF text and independent direct-link annotations in both templates.
+
 - Run the existing PDF and state regressions, TypeScript, ESLint and a production build.
 - Browser checks cover renamed light-mode persistence, logo/title/version, divider, author attribution and exact repository URL, complete/copyable/parseable JSON help, preserved hero font family and responsive landing layout.
 - Review screenshots before committing the 1.0.6 release. Preserve unrelated local changes.

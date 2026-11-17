@@ -67,6 +67,10 @@ export default function ResumeJsonHelp() {
         After editing, select Parse JSON to update the preview. Font sizes and
         spacing can be adjusted separately.
       </p>
+      <p>
+        Markdown-style profile links are cleaned automatically, including Google
+        search wrappers that contain a direct website URL.
+      </p>
       <button type="button" onClick={copyFramework}>
         Copy JSON framework
       </button>
