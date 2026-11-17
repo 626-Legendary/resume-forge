@@ -218,7 +218,7 @@ export default function Home() {
                 <span className="block text-orange-500">Apply sooner.</span>
               </h1>
 
-              <p className="mt-4 max-w-xl text-sm font-medium leading-6 text-zinc-300 sm:mt-6 sm:max-w-2xl sm:text-base sm:leading-7 md:text-xl md:leading-8">
+              <p className="mt-4 max-w-xl text-sm leading-7 text-zinc-400 sm:mt-6 sm:max-w-2xl sm:text-base">
                 Turn your AI-tailored content into a clean, ATS-friendly PDF.
                 Paste your JSON, review every US Letter page, and download the
                 resume you see. Spend your time on the next application.
