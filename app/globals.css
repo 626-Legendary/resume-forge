@@ -52,9 +52,6 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-  font-size: 21px;
-  font-weight: 750;
-  letter-spacing: -0.5px;
   text-decoration: none;
 }
 .builder-brand-mark {
@@ -72,8 +69,21 @@
   flex-direction: column;
   gap: 3px;
 }
-.builder-brand-title {
-  line-height: 1.2;
+.builder-brand-title,
+.builder-footer .app-footer-title {
+  font-family: var(--font-orbitron, var(--font-geist-sans)), sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 20px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+@media (min-width: 640px) {
+  .builder-brand-title,
+  .builder-footer .app-footer-title {
+    letter-spacing: 0.28em;
+  }
 }
 .builder-brand-meta {
   font-size: 11px;
@@ -376,9 +386,6 @@
 @media (max-width: 480px) {
   .builder {
     padding: 0 12px;
-  }
-  .builder-brand {
-    font-size: 17px;
   }
   .builder-brand {
     gap: 8px;
