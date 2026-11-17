@@ -5,6 +5,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { parseStoredResumeExport, RESUME_STORAGE_KEY } from "@/lib/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
 import type { ResumeData } from "@/types/resume";
+import type { ResumeFontSizes } from "@/lib/resume-typography";
 
 export type StoredResumeExportState =
   | { status: "loading"; message: string }
@@ -13,7 +14,7 @@ export type StoredResumeExportState =
       status: "ready";
       resumeData: ResumeData;
       templateId: ResumeTemplateId;
-      companyName: string;
+      fontSizes: ResumeFontSizes;
     };
 
 const SERVER_RESUME_SNAPSHOT = "__resume_forge_server_snapshot__";
@@ -67,7 +68,7 @@ function getExportState(
       status: "ready",
       resumeData: storedResumeExport.resumeData,
       templateId: storedResumeExport.templateId,
-      companyName: storedResumeExport.companyName || "",
+      fontSizes: storedResumeExport.fontSizes,
     };
   } catch {
     return {

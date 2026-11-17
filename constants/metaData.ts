@@ -1,3 +1,3 @@
-const app_version = "1.0.4";
+const app_version = "1.0.5";
 
 export { app_version };

@@ -5,6 +5,7 @@ import type { ResumeData } from "@/types/resume";
 export const mockResumeData: ResumeData = {
     basicInfo: {
         name: "Zexiang Zhang",
+        "company-name": "Apple",
         contact: {
             tel: "+1 626-265-2954",
             email: "zhangzexiang626@gmail.com",

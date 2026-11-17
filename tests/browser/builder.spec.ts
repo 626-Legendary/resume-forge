@@ -44,7 +44,7 @@ test("parse, paginate and download actual PDF; edits block stale exports", async
   const input = page.locator("#resume-json");
   await input.fill(
     JSON.stringify({
-      basicInfo: { name: "Zexiang Zhang" },
+      basicInfo: { name: "Zexiang Zhang", "company-name": "Apple" },
       summary: "Software engineer.",
     }),
   );
@@ -53,7 +53,7 @@ test("parse, paginate and download actual PDF; edits block stale exports", async
     page.getByText("1 page · US Letter", { exact: false }),
   ).toBeVisible();
   await expect(page.locator("canvas")).toHaveCount(1);
-  await page.getByLabel("Company name").fill("Apple");
+  await expect(page.locator("#target-company")).toHaveCount(0);
   const pending = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export PDF" }).click();
   const download = await pending;
@@ -84,6 +84,65 @@ test("parse, paginate and download actual PDF; edits block stale exports", async
   const secondDownload = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export PDF" }).click();
   await expect((await secondDownload).failure()).resolves.toBeNull();
+});
+
+test("font controls update actual downloaded PDF and reset to 14/12/10", async ({
+  page,
+}) => {
+  await page.goto("/dashboard");
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Section titles (pt)")).toHaveValue("12");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("10");
+  await page
+    .locator("#resume-json")
+    .fill(
+      JSON.stringify({
+        basicInfo: { name: "Typography User", "company-name": "HiddenTarget" },
+        summary: "Typography body",
+      }),
+    );
+  await page.getByRole("button", { name: "Parse JSON", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
+  await page.getByLabel("Name (pt)", { exact: true }).selectOption("22");
+  await page.getByLabel("Section titles (pt)").selectOption("16");
+  await page.getByLabel("Body text (pt)").selectOption("12.5");
+  await expect(page.getByRole("button", { name: "Export PDF" })).toBeEnabled();
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export PDF" }).click();
+  const download = await pending;
+  expect(download.suggestedFilename()).toMatch(
+    /^HiddenTarget_Typography_User_/,
+  );
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream!) chunks.push(chunk);
+  const { getDocument } = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  const document = await getDocument({
+    data: new Uint8Array(Buffer.concat(chunks)),
+    useSystemFonts: true,
+  }).promise;
+  try {
+    const content = await (await document.getPage(1)).getTextContent();
+    const items = content.items.filter((item) => "str" in item);
+    expect(
+      items.find((item) => item.str === "Typography User")?.height,
+    ).toBeCloseTo(22);
+    expect(items.find((item) => item.str === "Summary")?.height).toBeCloseTo(
+      16,
+    );
+    expect(
+      items.find((item) => item.str === "Typography body")?.height,
+    ).toBeCloseTo(12.5);
+    expect(items.map((item) => item.str).join(" ")).not.toContain(
+      "HiddenTarget",
+    );
+  } finally {
+    await document.loadingTask.destroy();
+  }
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(page.getByLabel("Name (pt)", { exact: true })).toHaveValue("14");
+  await expect(page.getByLabel("Section titles (pt)")).toHaveValue("12");
+  await expect(page.getByLabel("Body text (pt)")).toHaveValue("10");
 });
 
 test("validation errors, reset and responsive paper", async ({ page }) => {

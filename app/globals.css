@@ -189,7 +189,17 @@
 .builder-fields select {
   width: 100%;
 }
-#company-help {
+.font-size-controls legend {
+  font-size: 14px;
+  font-weight: 550;
+  margin-bottom: 12px;
+}
+.font-size-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+.font-size-controls > p {
   margin-top: 8px;
   font-size: 12px;
 }

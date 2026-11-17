@@ -12,6 +12,7 @@ export type ResumeData = {
 
 export type BasicInfo = {
   name: string;
+  "company-name"?: string;
   contact?: ContactInfo;
 };
 
@@ -68,4 +69,3 @@ export type Certification = {
   credentialId?: string;
   url?: string;
 };
-

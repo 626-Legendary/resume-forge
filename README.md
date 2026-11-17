@@ -1,4 +1,4 @@
-﻿# Resume Forge 1.0.4
+# Resume Forge 1.0.5
 
 A JSON-powered resume builder for AI-assisted job applications. Paste structured content, review every US Letter page, and download the same PDF shown in the preview.
 
@@ -6,18 +6,25 @@ A JSON-powered resume builder for AI-assisted job applications. Paste structured
 
 ![Resume Forge](./public/og-image.png)
 
-## What changed in 1.0.4
+## What changed in 1.0.5
+
+- Add optional `basicInfo["company-name"]` immediately after `name` in the JSON schema. It supplies the PDF filename prefix and is excluded from the resume body and text preview. The manual Company name input has been removed.
+- Add independent **Name**, **Section titles** and **Body text** font-size controls, defaulting to **14pt**, **12pt** and **10pt**. Choose 6–32pt in 0.5pt increments. Body size includes contact information, entry headings, links and bullets.
+- Font changes automatically regenerate the same PDF used for preview and download, including page breaks and page count. Export waits for the current settings; **Reset** restores the default sizes.
+- Preserve old JSON without a company field and migrate company metadata from 1.0.4 compatibility exports.
+
+## Core features
 
 - A focused two-panel dashboard replaces the crowded three-column console, repeated controls and scanning/pulsing effects.
 - **Simple mode** on `/dashboard` uses light surfaces and disables animations, transitions and smooth scrolling. The preference is remembered in this browser.
 - **Real paginated PDF preview** replaces crop lines. Each sheet is US Letter (612 × 792 points / 8.5 × 11 inches), with a page count and `Page n of N` labels.
 - Preview and download use the **same PDF bytes**. No browser print dialog or screenshot-to-PDF conversion is needed.
-- **Export PDF** downloads `Company_Full_Name_Mon_DD.pdf`, for example `Apple_Zexiang_Zhang_Nov_16.pdf`. An optional Company name field controls the prefix; it never appears in the resume. An omitted company uses `Resume`. Dates use the user's local date when clicking export, English month abbreviations and a two-digit day.
+- **Export PDF** downloads `Company_Full_Name_Mon_DD.pdf`, for example `Apple_Zexiang_Zhang_Nov_16.pdf`. The optional JSON field `basicInfo["company-name"]` controls the prefix; it never appears in the resume. An omitted or blank company uses `Resume`. Dates use the user's local date when clicking export, English month abbreviations and a two-digit day.
 - Input validation requires a JSON object with a non-empty `basicInfo.name`. Unparsed edits disable export, so an old preview cannot accidentally be downloaded as the current version.
 - Shared content, layout, rendering and builder modules replace duplicate dashboards, HTML templates and export implementations.
 - Updated Next.js to 16.4.6 and refreshed compatible dependencies to address the existing dependency audit findings.
 
-The design specification and UI audit are in [docs/UIUX-1.0.4.md](./docs/UIUX-1.0.4.md).
+The original design specification and UI audit are in [docs/UIUX-1.0.4.md](./docs/UIUX-1.0.4.md). The current company metadata and typography requirements are in [docs/UIUX-1.0.5.md](./docs/UIUX-1.0.5.md).
 
 ## Get started
 
@@ -33,7 +40,7 @@ Open `http://localhost:3000/dashboard`.
 1. Paste your JSON or select **Load example**.
 2. Select **Parse JSON** after changing content.
 3. Choose Engineer or Engineer Intern. The intern template places Education before Skills and Experience.
-4. Optionally enter the target company.
+4. Adjust **Name (pt)**, **Section titles (pt)** and **Body text (pt)** as needed. To name the export for a company, set `basicInfo["company-name"]` in JSON and parse again.
 5. Review the page count, page breaks and content. Open **Read resume text** for an accessible text alternative.
 6. Select **Export PDF** to download the document.
 
@@ -41,12 +48,13 @@ The page scales to the available width; its typography and Letter dimensions rem
 
 ## Resume schema
 
-Only `basicInfo.name` is required. Other sections and fields are optional; blank sections are omitted. Strings are trimmed. The TypeScript contract is in [types/resume.ts](./types/resume.ts); the full empty schema and sample content are in [constants/default.json](./constants/default.json) and [constants/mockData.json](./constants/mockData.json).
+Only `basicInfo.name` is required. Other sections and fields are optional; blank sections are omitted. Strings are trimmed. `basicInfo["company-name"]` is filename metadata only; it is unrelated to employer names in `experiences[].company`. Old JSON without this field still works. Font sizes are dashboard settings, separate from resume content. The TypeScript contract is in [types/resume.ts](./types/resume.ts); the full empty schema and sample content are in [constants/default.json](./constants/default.json) and [constants/mockData.json](./constants/mockData.json).
 
 ```json
 {
   "basicInfo": {
     "name": "Zexiang Zhang",
+    "company-name": "Apple",
     "contact": {
       "tel": "+1 555 123 4567",
       "email": "zexiang@example.com",
@@ -130,13 +138,13 @@ Return only valid JSON, without Markdown fences.
 
 ## PDF behavior and privacy
 
-PDF generation uses `@react-pdf/renderer`; PDF.js paints the resulting pages for preview. The download contains actual text and hyperlinks, using a single column, conventional section headings, 10pt Helvetica body text and 36pt margins. Long paragraphs and lists flow onto subsequent pages with heading and widow/orphan protection. These choices support ATS text extraction, but parsing varies between vendors and is not universally guaranteed.
+PDF generation uses `@react-pdf/renderer`; PDF.js paints the resulting pages for preview. The download contains actual text and hyperlinks, using a single column, conventional section headings, Helvetica and 36pt margins. The default font sizes are 14pt for the name, 12pt for section titles and 10pt for all body text. Each is independently adjustable. Long paragraphs and lists flow onto subsequent pages with heading and widow/orphan protection; increasing font sizes can increase page count. These choices support ATS text extraction, but parsing varies between vendors and is not universally guaranteed.
 
 The current PDF font targets English and Western Latin resumes. CJK scripts and emoji require a suitable embedded font before they can be supported reliably. US Letter is the only paper preset in this release. The canvas preview has a separate readable text view; text selection and link interaction are available in the downloaded PDF.
 
-Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content in memory and stores only the simple-mode preference. Reloading clears your current input and company name. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
+Resume parsing, PDF generation and previews run in the browser. The dashboard keeps resume content and font settings in memory and stores only the simple-mode preference. Reloading clears your current input and restores default font sizes. No resume data is submitted to an application backend. The app can still request static assets/fonts when loading.
 
-`/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts both the legacy raw resume and `{ resumeData, templateId, companyName? }` formats, uses the same PDF pipeline and offers a download link. The main dashboard downloads directly and does not write resumes to local storage. Simple mode is a visual preference, not an authentication or privacy boundary.
+`/export` remains a compatibility route for previously saved `resume-forge-data` local storage. It accepts legacy raw resumes and `{ resumeData, templateId, fontSizes? }` payloads, uses the same PDF pipeline and offers a download link. `fontSizes` has `{ name, section, body }` numeric values; missing or invalid individual sizes use their defaults. A legacy 1.0.4 `companyName` is migrated only when `basicInfo` has no `company-name` field; an explicit new value, including an empty string, takes precedence. The main dashboard downloads directly and does not write resumes to local storage. Simple mode is a visual preference, not an authentication or privacy boundary.
 
 ## Architecture
 
@@ -148,7 +156,8 @@ Resume parsing, PDF generation and previews run in the browser. The dashboard ke
 | `components/resume-pdf-document.tsx` | Letter PDF typography, margins and page wrapping                                   |
 | `components/use-resume-pdf.ts`       | Lazy PDF generation, serialized jobs, stale-result protection and blob URL cleanup |
 | `components/pdf-preview.tsx`         | Actual PDF page count, canvas rendering and readable text alternative              |
-| `components/use-builder.ts`          | Input, parsed snapshot, template and company state                                 |
+| `components/use-builder.ts`          | Input, parsed snapshot, template and font-size state                               |
+| `lib/resume-typography.ts`           | Font defaults, supported sizes and stored-setting validation                       |
 | `components/resume-builder.tsx`      | Shared dashboard UI and download interaction                                       |
 | `components/resume-export-view.tsx`  | Shared legacy export UI                                                            |
 
@@ -166,12 +175,13 @@ npm run build
 npm start
 ```
 
-Unit and PDF integration tests verify input validation, normalization, legacy exports, filename/date handling, safe links, template order, extractable PDF text, Letter dimensions, multiple pages and preservation/ordering of 120 long-content records within page margins.
+Unit and PDF integration tests verify input validation, normalization, company metadata migration and omission from resume content, legacy exports, filename/date handling, safe links, template order, default/custom font sizes extracted from actual PDFs, Letter dimensions, multiple pages and preservation/ordering of long content. Changing body size is checked for correct repagination without missing records.
 
-Playwright tests exercise mode persistence and motion suppression, actual PDF downloads and filenames, stale-input protection, template changes, invalid input, reset, mobile layout and compatibility export routes. Chromium is required. The test runner builds the app and starts its own production server on port 3104; screenshots and failure traces are placed in ignored `test-results/`.
+Playwright tests exercise mode persistence and motion suppression, JSON company-based filenames, removal of the manual company input, font controls and actual font sizes in the downloaded PDF, stale-input protection, template changes, invalid input, reset, mobile layout and the compatibility export route. Chromium is required. The test runner builds the app and starts its own production server on port 3104; screenshots and failure traces are placed in ignored `test-results/`.
 
 ## Earlier releases
 
+- **1.0.4** — Actual paginated Letter PDF preview/download, simple mode, shared rendering modules, private-route removal, regression tests and dependency security updates.
 - **1.0.3** — Layout fixes and the original PrivateDashboard interface.
 - **1.0.2** — Expanded resume schema and print crop lines (replaced by actual pagination in 1.0.4).
 - **1.0.1** — Bug fixes and performance improvements.

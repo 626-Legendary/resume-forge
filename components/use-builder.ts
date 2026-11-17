@@ -11,6 +11,10 @@ import {
   type ResumeTemplateId,
 } from "@/lib/resume-template";
 import type { ResumeData } from "@/types/resume";
+import {
+  DEFAULT_RESUME_FONT_SIZES,
+  type ResumeFontSizes,
+} from "@/lib/resume-typography";
 const initialInput = stringifyResumeJson(defaultResumeJson);
 export function useBuilder() {
   const [input, setInput] = useState(initialInput);
@@ -22,7 +26,9 @@ export function useBuilder() {
   const [templateId, setTemplateId] = useState<ResumeTemplateId>(
     DEFAULT_RESUME_TEMPLATE_ID,
   );
-  const [company, setCompany] = useState("");
+  const [fontSizes, setFontSizes] = useState<ResumeFontSizes>(
+    DEFAULT_RESUME_FONT_SIZES,
+  );
   function parse(value = input) {
     try {
       setParsed({ input: value, data: parseResumeJson(value) });
@@ -38,6 +44,7 @@ export function useBuilder() {
     parse(value);
   }
   function reset() {
+    setFontSizes(DEFAULT_RESUME_FONT_SIZES);
     setInput(initialInput);
     setParsed(null);
     setError("");
@@ -53,7 +60,7 @@ export function useBuilder() {
     reset,
     templateId,
     setTemplateId,
-    company,
-    setCompany,
+    fontSizes,
+    setFontSizes,
   };
 }

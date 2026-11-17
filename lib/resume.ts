@@ -1,6 +1,11 @@
 import defaultResumeJsonSource from "@/constants/default.json";
 import mockResumeJsonSource from "@/constants/mockData.json";
 import {
+  DEFAULT_RESUME_FONT_SIZES,
+  normalizeResumeFontSizes,
+  type ResumeFontSizes,
+} from "@/lib/resume-typography";
+import {
   DEFAULT_RESUME_TEMPLATE_ID,
   isResumeTemplateId,
   type ResumeTemplateId,
@@ -23,7 +28,7 @@ export const mockResumeJson: ResumeData = mockResumeJsonSource;
 export type StoredResumeExport = {
   resumeData: ResumeData;
   templateId: ResumeTemplateId;
-  companyName?: string;
+  fontSizes: ResumeFontSizes;
 };
 
 export function stringifyResumeJson(input: unknown): string {
@@ -48,6 +53,7 @@ export function normalizeResumeData(input: unknown): ResumeData {
   return {
     basicInfo: {
       name: toText(basicInfo.name),
+      "company-name": toText(basicInfo["company-name"]),
       contact: {
         tel: toText(contact.tel),
         email: toText(contact.email),
@@ -67,12 +73,12 @@ export function normalizeResumeData(input: unknown): ResumeData {
 export function createStoredResumeExport(
   resumeData: ResumeData,
   templateId: ResumeTemplateId,
-  companyName = "",
+  fontSizes: ResumeFontSizes = DEFAULT_RESUME_FONT_SIZES,
 ): StoredResumeExport {
   return {
     resumeData,
     templateId,
-    companyName,
+    fontSizes: normalizeResumeFontSizes(fontSizes),
   };
 }
 
@@ -83,9 +89,14 @@ export function parseStoredResumeExport(
   const source = toRecord(parsed);
 
   if ("resumeData" in source) {
+    const resumeData = normalizeResumeData(source.resumeData);
+    // Migrate 1.0.4 metadata only when the JSON has no explicit company field.
+    if (!("company-name" in toRecord(toRecord(source.resumeData).basicInfo))) {
+      resumeData.basicInfo["company-name"] = toText(source.companyName);
+    }
     return {
-      resumeData: normalizeResumeData(source.resumeData),
-      companyName: toText(source.companyName),
+      resumeData,
+      fontSizes: normalizeResumeFontSizes(source.fontSizes),
       templateId: isResumeTemplateId(source.templateId)
         ? source.templateId
         : DEFAULT_RESUME_TEMPLATE_ID,
@@ -94,6 +105,7 @@ export function parseStoredResumeExport(
 
   return {
     resumeData: normalizeResumeData(parsed),
+    fontSizes: normalizeResumeFontSizes(undefined),
     templateId: DEFAULT_RESUME_TEMPLATE_ID,
   };
 }

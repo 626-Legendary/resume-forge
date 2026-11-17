@@ -9,6 +9,10 @@ import {
 import { buildResumeLines } from "@/lib/resume-content";
 import type { ResumeData } from "@/types/resume";
 import type { ResumeTemplateId } from "@/lib/resume-template";
+import {
+  normalizeResumeFontSizes,
+  type ResumeFontSizes,
+} from "@/lib/resume-typography";
 
 // Preserve words and reading order in extracted PDF text.
 Font.registerHyphenationCallback((word) => [word]);
@@ -16,19 +20,16 @@ const styles = StyleSheet.create({
   page: {
     padding: 36,
     fontFamily: "Helvetica",
-    fontSize: 10,
     lineHeight: 1.35,
     color: "#111111",
   },
   name: {
-    fontSize: 20,
     fontFamily: "Helvetica-Bold",
     textAlign: "center",
     marginBottom: 5,
   },
-  contact: { fontSize: 9, textAlign: "center", marginBottom: 3 },
+  contact: { textAlign: "center", marginBottom: 3 },
   section: {
-    fontSize: 11,
     fontFamily: "Helvetica-Bold",
     borderBottomWidth: 0.7,
     paddingBottom: 3,
@@ -49,25 +50,42 @@ function printableText(text: string) {
 export default function ResumePdfDocument({
   data,
   templateId,
+  fontSizes,
 }: {
   data: ResumeData;
   templateId: ResumeTemplateId;
+  fontSizes?: ResumeFontSizes;
 }) {
+  const sizes = normalizeResumeFontSizes(fontSizes);
   return (
     <Document
       title={`${data.basicInfo.name} Resume`}
       author={data.basicInfo.name}
       language="en-US"
     >
-      <Page size="LETTER" style={styles.page} wrap>
+      <Page size="LETTER" style={[styles.page, { fontSize: sizes.body }]} wrap>
         {buildResumeLines(data, templateId).map((line, index) => (
           <Text
             key={index}
-            style={styles[line.kind]}
+            style={[
+              styles[line.kind],
+              {
+                fontSize:
+                  line.kind === "name"
+                    ? sizes.name
+                    : line.kind === "section"
+                      ? sizes.section
+                      : sizes.body,
+              },
+            ]}
             orphans={2}
             widows={2}
             minPresenceAhead={
-              line.kind === "section" ? 40 : line.kind === "heading" ? 24 : 0
+              line.kind === "section"
+                ? sizes.body * 4
+                : line.kind === "heading"
+                  ? sizes.body * 2.4
+                  : 0
             }
           >
             {line.link ? (

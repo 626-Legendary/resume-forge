@@ -10,6 +10,10 @@ import {
   type ResumeTemplateId,
 } from "@/lib/resume-template";
 import { app_version } from "@/constants/metaData";
+import {
+  RESUME_FONT_FIELDS,
+  RESUME_FONT_SIZE_OPTIONS,
+} from "@/lib/resume-typography";
 const MODE_KEY = "resume-forge-simple-mode";
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -36,7 +40,12 @@ export default function ResumeBuilder() {
     artifact,
     error: pdfError,
     loading,
-  } = useResumePdf(builder.data, builder.templateId, revision);
+  } = useResumePdf(
+    builder.data,
+    builder.templateId,
+    revision,
+    builder.fontSizes,
+  );
   const [downloadError, setDownloadError] = useState("");
   function toggleMode() {
     setModeOverride(!simple);
@@ -53,7 +62,7 @@ export default function ResumeBuilder() {
       const anchor = document.createElement("a");
       anchor.href = artifact.url;
       anchor.download = createExportFilename(
-        builder.company,
+        artifact.data.basicInfo["company-name"] || "",
         artifact.data.basicInfo.name,
       );
       document.body.append(anchor);
@@ -142,29 +151,47 @@ export default function ResumeBuilder() {
                 ))}
               </select>
             </div>
-            <div>
-              <label htmlFor="target-company">
-                Company name <span className="muted">(optional)</span>
-              </label>
-              <input
-                id="target-company"
-                placeholder="e.g. Apple"
-                value={builder.company}
-                onChange={(event) => builder.setCompany(event.target.value)}
-                maxLength={120}
-                aria-describedby="company-help"
-              />
-            </div>
+            <fieldset className="font-size-controls">
+              <legend>Font sizes</legend>
+              <div className="font-size-grid">
+                {RESUME_FONT_FIELDS.map(({ key, label }) => (
+                  <div key={key}>
+                    <label htmlFor={`font-size-${key}`}>{label}</label>
+                    <select
+                      id={`font-size-${key}`}
+                      value={builder.fontSizes[key]}
+                      onChange={(event) =>
+                        builder.setFontSizes((current) => ({
+                          ...current,
+                          [key]: Number(event.target.value),
+                        }))
+                      }
+                    >
+                      {RESUME_FONT_SIZE_OPTIONS.map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <p className="muted">
+                Sizes are in points. Changes update the PDF and pagination
+                automatically.
+              </p>
+            </fieldset>
           </div>
-          <p id="company-help" className="muted">
-            Company name is used only for the PDF filename.
-          </p>
           <details className="builder-help">
             <summary>JSON format and tips</summary>
             <p>
               Use basicInfo.name and optional summary, skills, experiences,
               projects, education and certifications. Empty sections are
               omitted.
+            </p>
+            <p>
+              Set <code>{'basicInfo["company-name"]'}</code> for the PDF filename. It is not
+              printed on your resume.
             </p>
             <p>
               Generate content using the schema below, then paste it into JSON
@@ -175,6 +202,7 @@ export default function ResumeBuilder() {
                 {
                   basicInfo: {
                     name: "Your Name",
+                    "company-name": "Apple",
                     contact: { tel: "", email: "", location: "" },
                   },
                   summary: "",

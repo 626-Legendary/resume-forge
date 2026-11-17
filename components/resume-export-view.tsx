@@ -14,6 +14,7 @@ export default function ResumeExportView() {
     state.status === "ready" ? state.resumeData : null,
     state.status === "ready" ? state.templateId : DEFAULT_RESUME_TEMPLATE_ID,
     revision,
+    state.status === "ready" ? state.fontSizes : undefined,
   );
   return (
     <main className="builder" data-mode="dark">
@@ -37,7 +38,7 @@ export default function ResumeExportView() {
                 className="inline-block my-4 underline"
                 href={artifact.url}
                 download={createExportFilename(
-                  state.companyName,
+                  state.resumeData.basicInfo["company-name"] || "",
                   state.resumeData.basicInfo.name,
                 )}
               >

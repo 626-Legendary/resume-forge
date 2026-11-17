@@ -8,6 +8,10 @@ import {
   normalizeResumeData,
 } from "../lib/resume";
 import { buildResumeLines, safeResumeUrl } from "../lib/resume-content";
+import {
+  DEFAULT_RESUME_FONT_SIZES,
+  normalizeResumeFontSizes,
+} from "../lib/resume-typography";
 
 test("filename uses company, full name and a local English date", () => {
   assert.equal(
@@ -70,13 +74,82 @@ test("export storage supports old raw data and new metadata", () => {
     parseStoredResumeExport(JSON.stringify(data)).templateId,
     "engineer",
   );
-  const stored = createStoredResumeExport(data, "engineer-intern", "Apple");
+  const stored = createStoredResumeExport(data, "engineer-intern", {
+    name: 18,
+    section: 13,
+    body: 10.5,
+  });
   assert.deepEqual(parseStoredResumeExport(JSON.stringify(stored)), stored);
   assert.equal(
     parseStoredResumeExport(
       JSON.stringify({ resumeData: data, templateId: "unknown" }),
     ).templateId,
     "engineer",
+  );
+});
+
+test("company-name is normalized after name, optional and excluded from content", () => {
+  const data = parseResumeJson(
+    JSON.stringify({
+      basicInfo: { name: " Alex ", "company-name": " Apple " },
+    }),
+  );
+  assert.equal(data.basicInfo["company-name"], "Apple");
+  assert.deepEqual(Object.keys(data.basicInfo).slice(0, 2), [
+    "name",
+    "company-name",
+  ]);
+  assert.equal(
+    normalizeResumeData({ basicInfo: { name: "Alex" } }).basicInfo[
+      "company-name"
+    ],
+    "",
+  );
+  for (const template of ["engineer", "engineer-intern"] as const) {
+    assert.ok(
+      buildResumeLines(data, template).every(
+        (line) => !line.text.includes("Apple"),
+      ),
+    );
+  }
+});
+
+test("legacy company metadata migrates without overriding explicit JSON", () => {
+  const legacy = {
+    resumeData: { basicInfo: { name: "Alex" } },
+    companyName: "Old Company",
+    templateId: "engineer",
+  };
+  const result = parseStoredResumeExport(JSON.stringify(legacy));
+  assert.equal(result.resumeData.basicInfo["company-name"], "Old Company");
+  assert.deepEqual(result.fontSizes, DEFAULT_RESUME_FONT_SIZES);
+  for (const company of ["New Company", ""]) {
+    const result = parseStoredResumeExport(
+      JSON.stringify({
+        ...legacy,
+        resumeData: { basicInfo: { name: "Alex", "company-name": company } },
+      }),
+    );
+    assert.equal(result.resumeData.basicInfo["company-name"], company);
+  }
+});
+
+test("font settings default independently and reject unsafe or invalid values", () => {
+  assert.deepEqual(normalizeResumeFontSizes(undefined), {
+    name: 14,
+    section: 12,
+    body: 10,
+  });
+  assert.deepEqual(
+    normalizeResumeFontSizes({ name: 20, section: "16", body: 10.5 }),
+    { name: 20, section: 12, body: 10.5 },
+  );
+  for (const invalid of [NaN, Infinity, -1, 0, 5.5, 32.5, 10.2, null]) {
+    assert.equal(normalizeResumeFontSizes({ body: invalid }).body, 10);
+  }
+  assert.deepEqual(
+    normalizeResumeFontSizes({ name: 6, section: 32, body: 8.5 }),
+    { name: 6, section: 32, body: 8.5 },
   );
 });
 
