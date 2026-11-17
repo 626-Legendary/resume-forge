@@ -77,10 +77,6 @@ const AppFooter = ({
                     v{app_version}
                   </span>
                 </p>
-
-                <p className="app-footer-tagline mt-1 hidden font-[var(--font-mono)] text-[11px] uppercase tracking-[0.16em] text-zinc-600 sm:block">
-                  JSON to print-ready resume
-                </p>
               </div>
             </div>
           </div>
@@ -133,12 +129,6 @@ const AppFooter = ({
               .
             </p>
           </div>
-
-          <p className="app-footer-note max-w-md text-zinc-500 md:text-right">
-            {isBuilder
-              ? "Your resume is generated in this browser."
-              : "Built to help job seekers move faster, apply smarter, and land sooner."}
-          </p>
         </div>
       </div>
     </footer>

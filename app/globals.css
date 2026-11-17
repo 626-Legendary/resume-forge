@@ -352,12 +352,10 @@
 .builder-footer .app-footer-author {
   color: var(--accent);
 }
-.builder-footer .app-footer-tagline,
 .builder-footer .app-footer-link,
 .builder-footer .app-footer-icon,
 .builder-footer .app-footer-meta,
-.builder-footer .app-footer-attribution,
-.builder-footer .app-footer-note {
+.builder-footer .app-footer-attribution {
   color: var(--muted);
 }
 .builder-footer .app-footer-attribution {
